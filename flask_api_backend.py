@@ -11,9 +11,41 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import random
+import csv
+import os
+import sqlite3
 
 app = Flask(__name__)
 CORS(app)
+
+def init_db():
+    conn = sqlite3.connect('patient_records.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS patient_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT,
+            patient_name TEXT,
+            age TEXT,
+            gender TEXT,
+            bmi TEXT,
+            heart_rate REAL,
+            spo2 REAL,
+            temperature REAL,
+            systolic_bp REAL,
+            diastolic_bp REAL,
+            glucose REAL,
+            resp_rate REAL,
+            cholesterol REAL,
+            prediction TEXT,
+            confidence REAL,
+            risk_score REAL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()
 
 # Load model artifacts
 with open('vital_model.pkl', 'rb') as f:
@@ -203,6 +235,72 @@ def meta():
 def health():
     return jsonify({'status': 'ok', 'model': 'VitalAI v1.0', 'accuracy': META['accuracy']})
 
+@app.route('/api/save_record', methods=['POST'])
+def save_record():
+    data = request.json
+    try:
+        conn = sqlite3.connect('patient_records.db')
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO patient_records (
+                timestamp, patient_name, age, gender, bmi, heart_rate, spo2, 
+                temperature, systolic_bp, diastolic_bp, glucose, resp_rate, 
+                cholesterol, prediction, confidence, risk_score
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('timestamp', datetime.now().isoformat()),
+            str(data.get('patient_name', 'Unknown')),
+            str(data.get('age', '')),
+            str(data.get('gender', '')),
+            str(data.get('bmi', '')),
+            float(data.get('heart_rate', 0)),
+            float(data.get('spo2', 0)),
+            float(data.get('temperature', 0)),
+            float(data.get('systolic_bp', 0)),
+            float(data.get('diastolic_bp', 0)),
+            float(data.get('glucose', 0)),
+            float(data.get('resp_rate', 0)),
+            float(data.get('cholesterol', 0)),
+            str(data.get('prediction', 'Unknown')),
+            float(data.get('confidence', 0)),
+            float(data.get('risk_score', 0))
+        ))
+        conn.commit()
+        conn.close()
+        
+        # Also keep CSV for legacy compatibility temporarily
+        file_exists = os.path.isfile('patient_records.csv')
+        with open('patient_records.csv', mode='a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=data.keys())
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow(data)
+            
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/history', methods=['GET'])
+def get_history():
+    try:
+        conn = sqlite3.connect('patient_records.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute('SELECT * FROM patient_records ORDER BY id ASC LIMIT 200')
+        rows = c.fetchall()
+        conn.close()
+        return jsonify([dict(ix) for ix in rows])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/shutdown', methods=['POST'])
+def shutdown():
+    import os, signal, threading
+    def kill_server():
+        os.kill(os.getpid(), signal.SIGTERM)
+    # Allows response to send successfully before killing script
+    threading.Timer(0.5, kill_server).start()
+    return jsonify({'status': 'success', 'message': 'Shutting down...'})
 
 if __name__ == '__main__':
     import webbrowser, threading

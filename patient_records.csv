@@ -1,0 +1,7 @@
+patient_name,age,gender,bmi,heart_rate,spo2,temperature,systolic_bp,diastolic_bp,glucose,resp_rate,cholesterol,prediction,confidence,risk_score
+NELSON,45,1,24.5,72,98,98.6,118,76,92,16,182,Normal,20,0
+NITHIN,58,1,30.2,88,97,98.8,165,105,115,17,245,Hypertension,99.5,42
+AKSHAY,62,1,26.8,95,96,98.5,124,78,96,18,198,Arrhythmia,98.9,38
+SALMAN,70,1,28.5,48,88,99.1,88,55,148,26,222,Bradycardia,62,55
+Anonymous Patient,45,1,24.5,92,98.6,98.4,115,76,92,16,182,Normal,20,0
+Anonymous Patient,70,1,28.5,48,88,99.1,88,55,148,26,222,Bradycardia,62,55

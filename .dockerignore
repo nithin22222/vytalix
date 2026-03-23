@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+.git
+.github
+*.csv
+*~
+.DS_Store
+patient_records.db
+vital_model.pkl
+venv/
+env/

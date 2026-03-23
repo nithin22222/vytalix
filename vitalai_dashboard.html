@@ -975,10 +975,12 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
       color: var(--text2);
       font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s ease;
     }
 
     .history-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--text);
     }
 
     /* ── RESPONSIVE ──────────────────────────── */
@@ -1082,9 +1084,21 @@
       </div>
     </div>
 
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      ML Active
+    <div style="display:flex; gap:16px; align-items:center;">
+      <div class="live-badge" id="mode-badge" onclick="toggleMode()"
+        style="cursor:pointer; background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.2); color:var(--accent);"
+        title="Click to login as Admin">
+        <div class="live-dot" style="background:var(--accent);"></div>
+        Patient Mode
+      </div>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        ML Active
+      </div>
+      <button onclick="shutdownServer()" title="Shutdown App"
+        style="margin-left:8px; display:flex; align-items:center; gap:6px; background:rgba(255,51,102,0.1); border:1px solid rgba(255,51,102,0.4); color:var(--red); padding:4px 12px; border-radius:20px; cursor:pointer; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">
+        <span style="font-size:12px;">⏻</span> Quit
+      </button>
     </div>
   </header>
 
@@ -1096,8 +1110,11 @@
       <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
       <button class="tab" onclick="switchTab('analysis')">🔬 Analysis</button>
       <button class="tab" onclick="switchTab('ecg')">💓 ECG Monitor</button>
-      <button class="tab" onclick="switchTab('history')">📋 Patient History</button>
-      <button class="tab" onclick="switchTab('model')">🧠 Model Insights</button>
+      <button class="tab" onclick="switchTab('about')">ℹ️ About NELSON</button>
+      <button class="tab admin-only" id="tab-btn-history" onclick="switchTab('history')" style="display:none;">📋
+        Patient History</button>
+      <button class="tab admin-only" id="tab-btn-model" onclick="switchTab('model')" style="display:none;">🧠 Model
+        Insights</button>
     </div>
 
     <!-- ═══════════════════════ TAB: DASHBOARD ═══════════════════════ -->
@@ -1121,7 +1138,8 @@
             <div class="form-grid">
               <div class="form-group" style="grid-column: span 2;">
                 <label>Patient Name</label>
-                <input type="text" id="patient_name" value="" placeholder="Enter patient full name" style="font-family:'Space Grotesk',sans-serif;">
+                <input type="text" id="patient_name" value="" placeholder="Enter patient full name"
+                  style="font-family:'Space Grotesk',sans-serif;">
               </div>
             </div>
 
@@ -1204,9 +1222,19 @@
               </div>
             </div>
 
-            <button class="btn-predict" id="predict-btn" onclick="runPrediction()">
-              ⚡ Run AI Health Analysis
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button class="btn-predict" id="predict-btn" onclick="runPrediction()" style="margin-top: 0; flex: 1;">
+                ⚡ Run AI Health Analysis
+              </button>
+              <button class="btn-secondary" id="dictate-btn" onclick="startDictation()" title="Voice Dictation"
+                style="margin-top: 0; padding: 0 15px; font-size: 20px; border-radius: 12px; background: rgba(0,212,255,0.05); border-color: var(--accent2);">
+                🎙️
+              </button>
+              <button class="btn-secondary" id="live-btn" onclick="toggleLiveMonitor()" title="Live Monitor Stream"
+                style="margin-top: 0; padding: 0 15px; font-size: 20px; border-radius: 12px; background: rgba(0,255,136,0.05); border-color: rgba(0,255,136,0.4);">
+                📡
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1315,7 +1343,8 @@
             </div>
 
             <!-- DOWNLOAD PDF BUTTON -->
-            <button id="download-pdf-btn" onclick="downloadPDF()" style="width:100%;margin-bottom:16px;padding:14px;background:linear-gradient(135deg,#0090cc,#00d4ff);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all 0.3s;position:relative;overflow:hidden;">
+            <button id="download-pdf-btn" onclick="downloadPDF()"
+              style="width:100%;margin-bottom:16px;padding:14px;background:linear-gradient(135deg,#0090cc,#00d4ff);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all 0.3s;position:relative;overflow:hidden;">
               📄 Download Patient Report as PDF
             </button>
 
@@ -1339,13 +1368,103 @@
               </div>
             </div>
 
-            <!-- COMPARE WITH NORMAL -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">Vitals vs Normal Range Comparison</div>
+            <!-- COMPARE & BODY MAP -->
+            <div class="grid-2">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Vitals vs Normal Range</div>
+                </div>
+                <div class="chart-wrap" style="height:240px;">
+                  <canvas id="radar-chart"></canvas>
+                </div>
               </div>
-              <div class="chart-wrap" style="height:240px;">
-                <canvas id="radar-chart"></canvas>
+              <div class="card" style="display:flex; flex-direction:column;">
+                <div class="card-header" style="margin-bottom:0;">
+                  <div class="card-title">Live AI Organ Mapping</div>
+                  <div class="card-badge" id="body-scan-status">IDLE</div>
+                </div>
+                <div
+                  style="flex:1; display:flex; justify-content:center; align-items:center; position:relative; overflow:hidden;">
+                  <svg id="human-body-svg" viewBox="0 0 100 240" style="height:100%; max-height:240px; opacity:0.8;">
+                    <style>
+                      .organ {
+                        fill: rgba(0, 212, 255, 0.05);
+                        stroke: rgba(0, 212, 255, 0.2);
+                        stroke-width: 1;
+                        transition: all 0.5s ease;
+                      }
+
+                      .outline {
+                        fill: none;
+                        stroke: var(--text3);
+                        stroke-width: 1.5;
+                        opacity: 0.5;
+                      }
+
+                      .glow-red {
+                        fill: rgba(255, 51, 102, 0.6) !important;
+                        stroke: var(--red) !important;
+                        filter: drop-shadow(0 0 8px var(--red));
+                      }
+
+                      .glow-blue {
+                        fill: rgba(0, 212, 255, 0.6) !important;
+                        stroke: var(--accent) !important;
+                        filter: drop-shadow(0 0 8px var(--accent));
+                      }
+
+                      .glow-green {
+                        fill: rgba(0, 255, 136, 0.4) !important;
+                        stroke: var(--green) !important;
+                        filter: drop-shadow(0 0 8px var(--green));
+                      }
+
+                      .glow-yellow {
+                        fill: rgba(255, 204, 0, 0.5) !important;
+                        stroke: var(--yellow) !important;
+                        filter: drop-shadow(0 0 8px var(--yellow));
+                      }
+
+                      @keyframes scan {
+                        0% {
+                          top: 0;
+                          opacity: 0;
+                        }
+
+                        10% {
+                          opacity: 1;
+                        }
+
+                        90% {
+                          opacity: 1;
+                        }
+
+                        100% {
+                          top: 100%;
+                          opacity: 0;
+                        }
+                      }
+                    </style>
+                    <!-- Body Outline -->
+                    <path class="outline"
+                      d="M 50 10 Q 55 10 58 15 Q 60 20 60 25 Q 60 30 55 35 L 65 40 Q 75 42 80 50 L 90 100 L 85 105 L 75 80 L 70 110 L 70 140 L 60 230 L 50 230 L 50 140 L 40 230 L 30 230 L 20 140 L 20 110 L 15 80 L 5 105 L 0 100 L 10 50 Q 15 42 25 40 L 35 35 Q 30 30 30 25 Q 30 20 32 15 Q 35 10 50 10 Z" />
+                    <!-- Brain -->
+                    <path id="organ-brain" class="organ"
+                      d="M 42 16 C 42 12, 58 12, 58 16 C 60 20, 56 26, 50 26 C 44 26, 40 20, 42 16 Z" />
+                    <!-- Lungs -->
+                    <path id="organ-lungs-l" class="organ" d="M 45 45 C 38 45, 30 55, 30 75 C 30 85, 42 85, 45 78 Z" />
+                    <path id="organ-lungs-r" class="organ" d="M 55 45 C 62 45, 70 55, 70 75 C 70 85, 58 85, 55 78 Z" />
+                    <!-- Heart -->
+                    <path id="organ-heart" class="organ" d="M 50 63 C 50 63, 46 58, 50 56 C 54 58, 54 62, 50 66 Z" />
+                    <!-- Liver -->
+                    <path id="organ-liver" class="organ" d="M 40 82 C 40 78, 60 76, 62 82 C 60 90, 48 90, 40 82 Z" />
+                    <!-- Pancreas / Glucose area -->
+                    <path id="organ-pancreas" class="organ" d="M 55 86 C 58 86, 62 88, 60 92 C 55 92, 45 92, 45 88 Z" />
+                  </svg>
+                  <div id="scanner-line"
+                    style="position:absolute; width:100%; height:3px; background:rgba(0,255,136,0.6); box-shadow:0 0 10px var(--green); display:none; animation: scan 1.5s linear infinite;">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1486,6 +1605,7 @@
         <table class="history-table" id="history-table">
           <thead>
             <tr>
+              <th>Name</th>
               <th>Timestamp</th>
               <th>HR (bpm)</th>
               <th>SpO₂ (%)</th>
@@ -1499,7 +1619,8 @@
           </thead>
           <tbody id="history-tbody">
             <tr>
-              <td colspan="9" style="text-align:center;color:var(--text3);padding:40px;">No records yet. Run an analysis
+              <td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No records yet. Run an
+                analysis
                 to add entries.</td>
             </tr>
           </tbody>
@@ -1531,7 +1652,7 @@
             <div>🌲 <strong>Random Forest</strong> — 60 trees, depth 10</div>
             <div>📈 <strong>Gradient Boosting</strong> — 60 estimators</div>
             <div>🔀 <strong>Soft Voting</strong> — Probability averaging</div>
-            <div style="margin-top:12px;color:var(--text3);font-size:12px;">Trained on 50,000 patient records with 15
+            <div style="margin-top:12px;color:var(--text3);font-size:12px;">Trained on 100,000 patient records with 15
               vital features covering 8 medical conditions.</div>
           </div>
         </div>
@@ -1543,11 +1664,11 @@
               <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Accuracy</div>
             </div>
             <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--accent);">40K</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--accent);">80K</div>
               <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Train Set</div>
             </div>
             <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--yellow);">10K</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--yellow);">20K</div>
               <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Test Set</div>
             </div>
             <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
@@ -1591,6 +1712,77 @@
           </div>
           <div class="chart-wrap" style="height:280px;">
             <canvas id="distribution-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ TAB: ABOUT NELSON AI ═══════════════════════ -->
+    <div id="tab-about" class="tab-content fade-in">
+      <div class="card" style="margin-bottom: 20px; text-align: center; padding: 40px 20px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🩺</div>
+        <h1 style="color:var(--text2); margin-bottom: 15px;">NELSON AI</h1>
+        <p style="color:var(--text3); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+          An advanced Health Dashboard and ICU Monitor. This application works by merging Machine Learning, LLMs, and Interactive Web Technologies to provide real-time clinical analysis.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🧠 Machine Learning Core</div>
+          </div>
+          <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
+            <p style="margin-bottom: 10px; color: var(--text3);">The backend relies on an ensemble ML model architecture specifically tuned for processing raw vital signs.</p>
+            <ul style="padding-left: 20px;">
+              <li><strong style="color:var(--accent);">Random Forest Classifier:</strong> 60 estimators handling feature weighting.</li>
+              <li><strong style="color:var(--yellow);">Gradient Boosting Modeler:</strong> Fine-tuned to detect complex conditional edge-cases like Arrhythmia combinations.</li>
+              <li><strong style="color:var(--green);">Soft Voting Algorithm:</strong> Combines the probability matrices directly inside Python's Scikit-Learn logic.</li>
+            </ul>
+            <p style="margin-top: 10px;">The model was originally trained on <b>100,000 synthetic patient records</b> utilizing 15 distinct vital features.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✨ Architecture & Technologies</div>
+          </div>
+          <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
+            <ul style="padding-left: 20px;">
+              <li><strong style="color:var(--accent);">Frontend UI:</strong> Plain HTML/CSS/JS with zero external frameworks. Beautiful glassmorphic UI, Chart.js for data visualization, and dynamic SVGs.</li>
+              <li><strong style="color:var(--pulse);">Flask API Backend:</strong> Local Python Flask server acting as the communication bridge.</li>
+              <li><strong style="color:var(--yellow);">Data Persistence:</strong> SQLite3 database (`patient_records.db`) saving historical patient runs for Admin auditing.</li>
+              <li><strong style="color:var(--green);">API Integration:</strong> Leverages Anthropic's Claude API for natural language clinical interpretations of the ML predictions.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📡 Key Features</div>
+          </div>
+          <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
+            <ul style="padding-left: 20px;">
+              <li><strong>Interactive Body Map:</strong> A 3D/SVG simulated human body automatically highlights stressed organs (e.g., Lungs for Hypoxia, Heart for Tachycardia) dynamically based on AI predictions.</li>
+              <li><strong>Live ICU Stream:</strong> Simulates real-time telemetry sensor drift. Constantly polls changing vitals directly into the AI for live ICU monitoring alerts.</li>
+              <li><strong>Animated ECG:</strong> Built from scratch using Javascript RequestAnimationFrame, calculating custom heartbeat waveforms mathematically tied to patient inputs.</li>
+              <li><strong>Admin Mode:</strong> PIN-protected layer revealing Model Insights and Patient History ledgers.</li>
+              <li><strong>Voice Dictation:</strong> Uses browser SpeechRecognition API to parse spoken vitals into input fields.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚀 How it is Made & Deployed</div>
+          </div>
+          <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
+            <p style="margin-bottom:10px; color: var(--text3);">Designed entirely as a portable, standalone application suite.</p>
+            <ul style="padding-left: 20px;">
+              <li><strong style="color:var(--accent);">Silent Launcher:</strong> A VBScript (`Launch_Dashboard.vbs`) starts the Flask Server completely invisibly in the background.</li>
+              <li><strong style="color:var(--yellow);">Browser Auto-Boot:</strong> The script dynamically opens `vitalai_dashboard.html` directly in the user's web browser.</li>
+              <li><strong style="color:var(--green);">Internal Kill Switch:</strong> The UI's "Quit" button sends a `/api/shutdown` POST request straight to Flask which immediately gracefully shuts down the Python OS Process.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1850,7 +2042,7 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
-      setTimeout(() => {
+      setTimeout(async () => {
         const result = mlPredict(v);
         const riskScore = computeRiskScore(v, result.prediction);
         const alerts = getAbnormalVitals(v);
@@ -1859,9 +2051,32 @@
         lastVitals = v;
         lastResult = { ...result, riskScore, alerts };
 
-        // Store in history
+        const pName = document.getElementById('patient_name')?.value || 'Anonymous Patient';
+
+        // Save to Database
+        try {
+          await fetch('/api/save_record', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              patient_name: pName,
+              age: v.age, gender: v.gender, bmi: v.bmi,
+              heart_rate: v.heart_rate, spo2: v.spo2,
+              temperature: v.temperature,
+              systolic_bp: v.systolic_bp, diastolic_bp: v.diastolic_bp,
+              glucose: v.glucose, resp_rate: v.resp_rate,
+              cholesterol: v.cholesterol,
+              prediction: result.prediction,
+              confidence: result.confidence,
+              risk_score: riskScore
+            })
+          });
+        } catch(e) { console.error('DB save failed', e); }
+
+        // Store in history locally as fallback
         historyData.push({
           time: new Date().toLocaleTimeString(),
+          name: pName,
           hr: v.heart_rate, spo2: v.spo2,
           bp: `${v.systolic_bp}/${v.diastolic_bp}`,
           temp: v.temperature, glucose: v.glucose,
@@ -1944,6 +2159,7 @@
         updateCompareTable(v);
         updateHistoryTable();
         generateECG();
+        updateBodyMap(result.prediction, alerts);
 
         btn.disabled = false;
         btn.innerHTML = '⚡ Run AI Health Analysis';
@@ -2146,8 +2362,11 @@
     }
 
     // ═══════════════════════════════════════════════
-    //  ECG GENERATION
+    //  ECG GENERATION (Animated)
     // ═══════════════════════════════════════════════
+    let ecgAnimId = null;
+    let ecgX = 0;
+    let ecgPhase = 0;
 
     function generateECG() {
       const v = lastVitals || getInputValues();
@@ -2163,56 +2382,82 @@
       canvas.width = W;
       canvas.height = 140;
 
+      if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
+      ecgX = 0;
+      ecgPhase = 0;
+
+      // Wipe clear on start
       ctx.fillStyle = '#020d08';
       ctx.fillRect(0, 0, W, 140);
 
-      const sampleRate = 200;
-      const duration = 4;
-      const N = sampleRate * duration;
       const period = 60.0 / hr;
+      const prS = pr / 1000, qrsS = qrs / 1000, qtS = qt / 1000;
 
-      // Generate ECG signal
-      const ecg = new Float32Array(N);
-      for (let i = 0; i < N; i++) {
-        const t = i / sampleRate;
-        let v_ecg = 0;
-        let beat_t = t % period;
-        const prS = pr / 1000;
-        const qrsS = qrs / 1000;
-        const qtS = qt / 1000;
+      const isCritical = hr > 120 || hr < 50 || st > 1.5;
+      ctx.strokeStyle = isCritical ? '#ff3366' : '#00ff88';
+      ctx.lineWidth = 2.0;
+      ctx.shadowColor = isCritical ? 'rgba(255,51,102,0.6)' : 'rgba(0,255,136,0.6)';
+      ctx.shadowBlur = 8;
 
-        // P wave
-        v_ecg += 0.15 * Math.exp(-Math.pow(beat_t - prS * 0.5, 2) / 0.0008);
-        // Q
-        v_ecg -= 0.1 * Math.exp(-Math.pow(beat_t - (prS + 0.02), 2) / 0.00015);
-        // R
-        v_ecg += 1.1 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.4), 2) / 0.00008);
-        // S
-        v_ecg -= 0.25 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.7), 2) / 0.00015);
-        // ST + T wave
-        const tPeak = prS + qtS * 0.75;
-        v_ecg += (0.3 + st * 0.08) * Math.exp(-Math.pow(beat_t - tPeak, 2) / 0.002);
-        // ST elevation flat segment
-        if (beat_t > prS + qrsS && beat_t < prS + qtS * 0.6) v_ecg += st * 0.06;
-        // Noise
-        v_ecg += (Math.random() - 0.5) * 0.012;
-        ecg[i] = v_ecg;
+      let lastY = 70;
+
+      function drawFrame() {
+        const movePx = Math.ceil(W / 200); // Speed of sweep
+
+        ctx.beginPath();
+        if (ecgX > 0) ctx.moveTo(ecgX - 1, lastY);
+
+        for (let i = 0; i < movePx; i++) {
+          ecgPhase += (hr / 60) * (1 / 60) * 1.5; // Scale animation speed logically with HR
+          let beat_t = ecgPhase % period;
+          let v_ecg = 0;
+          // P wave
+          v_ecg += 0.15 * Math.exp(-Math.pow(beat_t - prS * 0.5, 2) / 0.0008);
+          // Q
+          v_ecg -= 0.1 * Math.exp(-Math.pow(beat_t - (prS + 0.02), 2) / 0.00015);
+          // R
+          v_ecg += 1.1 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.4), 2) / 0.00008);
+          // S
+          v_ecg -= 0.25 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.7), 2) / 0.00015);
+          // ST + T wave
+          const tPeak = prS + qtS * 0.75;
+          v_ecg += (0.3 + st * 0.08) * Math.exp(-Math.pow(beat_t - tPeak, 2) / 0.002);
+          if (beat_t > prS + qrsS && beat_t < prS + qtS * 0.6) v_ecg += st * 0.06;
+          // Noise
+          v_ecg += (Math.random() - 0.5) * 0.02;
+
+          const scaleY = 40;
+          const newY = 70 - v_ecg * scaleY;
+
+          // Eraser block moving ahead of the pen
+          ctx.clearRect(ecgX + 2, 0, 20, 140);
+          ctx.fillStyle = '#020d08';
+          ctx.fillRect(ecgX + 2, 0, 20, 140);
+
+          ctx.lineTo(ecgX, newY);
+
+          ecgX++;
+          lastY = newY;
+
+          if (ecgX >= W) {
+            ecgX = 0;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(ecgX, newY);
+          }
+        }
+        ctx.stroke();
+
+        // Draw shining head
+        ctx.fillStyle = isCritical ? '#ffffff' : '#ccffcc';
+        ctx.beginPath();
+        ctx.arc(ecgX, lastY, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ecgAnimId = requestAnimationFrame(drawFrame);
       }
 
-      // Draw
-      const midY = 70;
-      const scaleY = 38;
-      ctx.strokeStyle = '#00ff88';
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = 'rgba(0,255,136,0.4)';
-      ctx.shadowBlur = 4;
-      ctx.beginPath();
-      for (let i = 0; i < N; i++) {
-        const x = (i / N) * W;
-        const y = midY - ecg[i] * scaleY;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
+      ecgAnimId = requestAnimationFrame(drawFrame);
 
       // Update ECG metrics
       document.getElementById('ecg-hr-badge').textContent = `${hr} BPM`;
@@ -2287,16 +2532,43 @@
     //  HISTORY
     // ═══════════════════════════════════════════════
 
-    function updateHistoryTable() {
+    async function updateHistoryTable() {
       const tbody = document.getElementById('history-tbody');
-      if (historyData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:40px;">No records yet.</td></tr>';
+
+      try {
+        const res = await fetch('/api/history');
+        const data = await res.json();
+        if (data && data.length > 0) {
+          window.historyData = data.map(dbRow => {
+            let d = new Date(dbRow.timestamp);
+            return {
+              id: dbRow.id,
+              name: dbRow.patient_name || 'Patient',
+              time: isNaN(d) ? dbRow.timestamp : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              hr: dbRow.heart_rate,
+              spo2: dbRow.spo2,
+              bp: `${Math.round(dbRow.systolic_bp)}/${Math.round(dbRow.diastolic_bp)}`,
+              temp: dbRow.temperature,
+              glucose: dbRow.glucose,
+              prediction: dbRow.prediction,
+              confidence: dbRow.confidence,
+              riskScore: dbRow.risk_score,
+              raw: dbRow
+            };
+          });
+        }
+      } catch (e) { console.error('Error fetching admin history:', e); }
+
+      if (!historyData || historyData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No records yet.</td></tr>';
         return;
       }
-      tbody.innerHTML = historyData.slice().reverse().map(r => {
+      tbody.innerHTML = historyData.slice().reverse().map((r, i) => {
         const color = r.riskScore < 20 ? 'var(--green)' : r.riskScore < 50 ? 'var(--yellow)' : 'var(--red)';
+        const idx = historyData.length - 1 - i;
         return `
-      <tr>
+      <tr class="history-row" onclick="loadHistoryToDashboard(${idx})" title="Click to load this patient into Dashboard" style="cursor:pointer;">
+        <td style="color:var(--accent); font-weight:600;">${r.name || r.raw?.patient_name || 'Anonymous'}</td>
         <td>${r.time}</td>
         <td>${r.hr}</td>
         <td>${r.spo2}</td>
@@ -2349,6 +2621,35 @@
       historyData = [];
       updateHistoryTable();
       showToast('History cleared');
+    }
+
+    function loadHistoryToDashboard(idx) {
+      if (!adminMode) {
+        showToast('Requires Admin Mode.');
+        return;
+      }
+      if (!historyData || !historyData[idx]) return;
+      const record = historyData[idx];
+      if (!record.raw) {
+        showToast('Detailed DB record not available for this legacy entry.');
+        return;
+      }
+      document.getElementById('patient_name').value = record.raw.patient_name || '';
+      document.getElementById('age').value = record.raw.age || 45;
+      document.getElementById('gender').value = record.raw.gender || 1;
+      document.getElementById('bmi').value = record.raw.bmi || 24.5;
+      document.getElementById('heart_rate').value = record.raw.heart_rate || 72;
+      document.getElementById('spo2').value = record.raw.spo2 || 98;
+      document.getElementById('systolic_bp').value = record.raw.systolic_bp || 118;
+      document.getElementById('diastolic_bp').value = record.raw.diastolic_bp || 76;
+      document.getElementById('temperature').value = record.raw.temperature || 98.6;
+      document.getElementById('glucose').value = record.raw.glucose || 92;
+      document.getElementById('resp_rate').value = record.raw.resp_rate || 16;
+      document.getElementById('cholesterol').value = record.raw.cholesterol || 180;
+
+      switchTab('dashboard');
+      updateLiveMetrics();
+      showToast(`Loaded ${record.raw.patient_name || 'Patient'} into Dashboard.`);
     }
 
     // ═══════════════════════════════════════════════
@@ -2460,7 +2761,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
 
     function switchTab(tab) {
       document.querySelectorAll('.tab').forEach((t, i) => {
-        const tabs = ['dashboard', 'analysis', 'ecg', 'history', 'model'];
+        const tabs = ['dashboard', 'analysis', 'ecg', 'about', 'history', 'model'];
         t.classList.toggle('active', tabs[i] === tab);
       });
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -2486,6 +2787,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       updateLiveMetrics();
       generateECG();
       renderModelCharts();
+      updateHistoryTable(); // Fetch and load patients instantly on load
 
       // Animate ECG header heartbeat simulation
       const hrInputs = ['heart_rate', 'spo2', 'temperature', 'systolic_bp', 'diastolic_bp', 'glucose'];
@@ -2568,9 +2870,9 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
         ['Resp Rate', v.resp_rate + ' br/min']
       ];
       demoData.forEach(([label, val]) => {
-        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(80,80,80);
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(80, 80, 80);
         doc.text(label + ':', 16, y);
-        doc.setFont('helvetica', 'normal'); doc.setTextColor(40,40,40);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(40, 40, 40);
         doc.text(val.toString(), 55, y);
         y += 5;
       });
@@ -2594,7 +2896,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       // Table header
       doc.setFillColor(235, 245, 255);
       doc.rect(14, y - 3, pageW - 28, 7, 'F');
-      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(60,60,60);
+      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(60, 60, 60);
       doc.text('Parameter', 16, y + 1);
       doc.text('Value', 80, y + 1);
       doc.text('Normal Range', 120, y + 1);
@@ -2618,13 +2920,13 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       vitals.forEach(([param, val, normal], idx) => {
         checkPage();
         if (idx % 2 === 0) { doc.setFillColor(248, 250, 255); doc.rect(14, y - 3, pageW - 28, 6, 'F'); }
-        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50,50,50);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50);
         doc.text(param, 16, y);
         doc.text(val.toString(), 80, y);
-        doc.setTextColor(120,120,120);
+        doc.setTextColor(120, 120, 120);
         doc.text(normal, 120, y);
         // determine status
-        const nr = NORMAL_RANGES[param.toLowerCase().replace(/ /g,'_').replace('₂','2')];
+        const nr = NORMAL_RANGES[param.toLowerCase().replace(/ /g, '_').replace('₂', '2')];
         const numVal = parseFloat(val);
         let status = 'Normal';
         let statusColor = [0, 140, 60];
@@ -2674,7 +2976,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       recs.forEach((rec, i) => {
         checkPage();
         const lines = doc.splitTextToSize((i + 1) + '. ' + rec, pageW - 32);
-        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50,50,50);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50);
         doc.text(lines, 16, y);
         y += lines.length * 4.5;
       });
@@ -2692,6 +2994,226 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       const filename = 'NELSON_AI_Report_' + new Date().toISOString().slice(0, 10) + '.pdf';
       doc.save(filename);
       showToast('PDF report downloaded: ' + filename);
+    }
+
+    // ═══════════════════════════════════════════════
+    //  VOICE DICTATION
+    // ═══════════════════════════════════════════════
+    function startDictation() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showToast('Speech recognition not supported in this browser.');
+        return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      const btn = document.getElementById('dictate-btn');
+      const originalBg = btn.style.background;
+      btn.style.background = 'rgba(255, 51, 102, 0.2)';
+      btn.style.borderColor = 'var(--red)';
+      showToast('Listening... Speak vitals like "Heart rate 85"');
+
+      recognition.start();
+      recognition.onresult = function (e) {
+        const text = e.results[0][0].transcript.toLowerCase();
+        let hrMatch = text.match(/heart\s*rate.*?(\d+)/) || text.match(/pulse.*?(\d+)/);
+        if (hrMatch) document.getElementById('heart_rate').value = hrMatch[1];
+
+        let spo2Match = text.match(/oxygen.*?(\d+)|spo2.*?(\d+)/i);
+        if (spo2Match) document.getElementById('spo2').value = spo2Match[1] || spo2Match[2];
+
+        let tempMatch = text.match(/temperature.*?(\d+\.?\d*)/);
+        if (tempMatch) document.getElementById('temperature').value = tempMatch[1];
+
+        let bpMatch = text.match(/blood\s*pressure.*?(\d+).*?over.*?(\d+)/);
+        if (bpMatch) {
+          document.getElementById('systolic_bp').value = bpMatch[1];
+          document.getElementById('diastolic_bp').value = bpMatch[2];
+        } else {
+          let sys = text.match(/systolic.*?(\d+)/);
+          if (sys) document.getElementById('systolic_bp').value = sys[1];
+          let dia = text.match(/diastolic.*?(\d+)/);
+          if (dia) document.getElementById('diastolic_bp').value = dia[1];
+        }
+
+        let glucoseMatch = text.match(/glucose.*?(\d+)|sugar.*?(\d+)/);
+        if (glucoseMatch) document.getElementById('glucose').value = glucoseMatch[1] || glucoseMatch[2];
+
+        updateLiveMetrics();
+        showToast('Processed: ' + text);
+        btn.style.background = originalBg;
+        btn.style.borderColor = 'var(--accent2)';
+      };
+
+      recognition.onerror = function (e) {
+        showToast('Voice error.');
+        btn.style.background = originalBg;
+        btn.style.borderColor = 'var(--accent2)';
+      };
+
+      recognition.onend = function () {
+        btn.style.background = originalBg;
+        btn.style.borderColor = 'var(--accent2)';
+      };
+    }
+
+    // ═══════════════════════════════════════════════
+    //  3D/SVG BODY MAP & LIVE ICU MONITOR
+    // ═══════════════════════════════════════════════
+    function updateBodyMap(prediction, alerts) {
+      document.querySelectorAll('.organ').forEach(el => el.setAttribute('class', 'organ'));
+      const st = document.getElementById('body-scan-status');
+      st.textContent = prediction.toUpperCase();
+
+      const h = document.getElementById('organ-heart');
+      const ll = document.getElementById('organ-lungs-l');
+      const lr = document.getElementById('organ-lungs-r');
+      const b = document.getElementById('organ-brain');
+      const lv = document.getElementById('organ-liver');
+      const p = document.getElementById('organ-pancreas');
+
+      const scan = document.getElementById('scanner-line');
+      if (scan) {
+        scan.style.display = 'block';
+        setTimeout(() => { scan.style.display = 'none'; }, 1500);
+      }
+
+      if (prediction === 'Normal') {
+        st.style.color = 'var(--green)';
+        [h, ll, lr].forEach(o => o?.classList.add('glow-green'));
+      } else if (prediction === 'Hypertension') {
+        st.style.color = 'var(--yellow)';
+        [h, b].forEach(o => o?.classList.add('glow-yellow'));
+      } else if (prediction === 'Hypoxia') {
+        st.style.color = 'var(--red)';
+        b?.classList.add('glow-red');
+        [ll, lr].forEach(o => o?.classList.add('glow-blue'));
+      } else if (prediction.includes('cardia') || prediction === 'Arrhythmia') {
+        st.style.color = 'var(--red)';
+        h?.classList.add('glow-red');
+      } else if (prediction === 'Diabetes Risk') {
+        st.style.color = 'var(--yellow)';
+        p?.classList.add('glow-yellow');
+      } else if (prediction === 'Fever/Infection') {
+        st.style.color = 'var(--yellow)';
+        [lv, b].forEach(o => o?.classList.add('glow-yellow'));
+      }
+    }
+
+    let liveMonitorInterval = null;
+    let isLive = false;
+
+    function toggleLiveMonitor() {
+      const btn = document.getElementById('live-btn');
+      isLive = !isLive;
+
+      if (isLive) {
+        btn.style.background = 'rgba(255, 51, 102, 0.1)';
+        btn.style.borderColor = 'var(--red)';
+        btn.innerHTML = '🔴';
+        showToast('▶️ Live ICU Monitor ON. Simulating telemetry...');
+
+        liveMonitorInterval = setInterval(() => {
+          // Add tiny random walks to vitals
+          const noise = (val, maxShift) => Math.max(0, val + (Math.random() * maxShift * 2 - maxShift));
+
+          let hr = document.getElementById('heart_rate');
+          hr.value = Math.round(noise(parseInt(hr.value || 72), 3));
+
+          let spo2 = document.getElementById('spo2');
+          spo2.value = Math.min(100, (noise(parseFloat(spo2.value || 98), 1)).toFixed(1));
+
+          let sys = document.getElementById('systolic_bp');
+          sys.value = Math.round(noise(parseInt(sys.value || 120), 4));
+
+          let temp = document.getElementById('temperature');
+          temp.value = (noise(parseFloat(temp.value || 98.6), 0.2)).toFixed(1);
+
+          updateLiveMetrics();
+
+          // Randomly trigger prediction for the "Live effect" without saving to DB to avoid spam
+          const v = getInputValues();
+          const result = mlPredict(v);
+          const alerts = getAbnormalVitals(v);
+          updateBodyMap(result.prediction, alerts);
+          generateECG();
+
+          // Auto-trigger alerts if extremely critical
+          const risk = computeRiskScore(v, result.prediction);
+          const modal = document.getElementById('hackathon-modal');
+          if (risk >= 80 && alerts.length > 0 && (!modal || modal.style.opacity === '0')) {
+            showCriticalPrecautionBanner(alerts);
+          }
+
+        }, 2500);
+      } else {
+        clearInterval(liveMonitorInterval);
+        btn.style.background = 'rgba(0,255,136,0.05)';
+        btn.style.borderColor = 'rgba(0,255,136,0.4)';
+        btn.innerHTML = '📡';
+        showToast('⏹️ Live ICU Monitor OFF.');
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    //  MODE TOGGLE (Admin / Patient)
+    // ═══════════════════════════════════════════════
+    let adminMode = false;
+
+    function toggleMode() {
+      if (!adminMode) {
+        // Switch to Admin Mode
+        const pass = prompt('Enter Admin PIN (Hint: 1234):');
+        if (pass === '1234') {
+          adminMode = true;
+          document.getElementById('mode-badge').innerHTML = '<div class="live-dot" style="background:var(--yellow);"></div>Admin Mode';
+          document.getElementById('mode-badge').style.color = 'var(--yellow)';
+          document.getElementById('mode-badge').style.borderColor = 'rgba(255,204,0,0.3)';
+          document.getElementById('mode-badge').style.background = 'rgba(255,204,0,0.1)';
+          document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+          updateHistoryTable(); // Fetch from DB immediately
+          showToast('Admin Mode unlocked. DB Synced.');
+        } else if (pass !== null) {
+          showToast('Incorrect PIN.');
+        }
+      } else {
+        // Switch to Patient Mode
+        adminMode = false;
+        document.getElementById('mode-badge').innerHTML = '<div class="live-dot" style="background:var(--accent);"></div>Patient Mode';
+        document.getElementById('mode-badge').style.color = 'var(--accent)';
+        document.getElementById('mode-badge').style.borderColor = 'rgba(0,212,255,0.2)';
+        document.getElementById('mode-badge').style.background = 'rgba(0,212,255,0.08)';
+        document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+
+        // Switch back to dashboard if they are on a hidden tab
+        if (document.getElementById('tab-history')?.classList.contains('active') ||
+          document.getElementById('tab-model')?.classList.contains('active')) {
+          switchTab('dashboard');
+        }
+        showToast('Switched to Patient Mode.');
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    //  SYSTEM SHUTDOWN
+    // ═══════════════════════════════════════════════
+    function shutdownServer() {
+      if (confirm('Are you sure you want to stop the local server and quit NELSON AI?')) {
+        fetch('/api/shutdown', { method: 'POST' }).catch(() => { });
+        document.body.innerHTML = `
+          <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;">
+            <div style="font-size:64px;margin-bottom:20px;filter:grayscale(1);opacity:0.5;">🩺</div>
+            <h1 style="color:var(--text2);margin-bottom:10px;font-weight:600;letter-spacing:-0.5px;">NELSON AI Disconnected</h1>
+            <p style="color:var(--text3);font-size:15px;max-width:400px;text-align:center;line-height:1.6;">
+              The local backend server has been safely stopped.<br>
+              You can now close this browser window.
+            </p>
+          </div>
+        `;
+      }
     }
   </script>
 </body>
