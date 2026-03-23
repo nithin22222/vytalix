@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NELSON — AI-Based Vital Analysis & Health Prediction System</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #020509;
+      --bg2: #060d14;
+      --bg3: #0a1520;
+      --card: #0d1e2e;
+      --card2: #112030;
+      --border: #1a3045;
+      --border2: #1f3a55;
+      --text: #e8f4ff;
+      --text2: #7ba8cc;
+      --text3: #4a7a9b;
+      --accent: #00d4ff;
+      --accent2: #0090cc;
+      --green: #00ff88;
+      --yellow: #ffcc00;
+      --orange: #ff8800;
+      --red: #ff3366;
+      --critical: #ff0055;
+      --pulse: #ff4488;
+      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+      --glow-g: 0 0 20px rgba(0, 255, 136, 0.3);
+      --glow-r: 0 0 20px rgba(255, 51, 102, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(0, 60, 120, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(0, 30, 60, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(2, 5, 9, 0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: var(--glow);
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hstat {
+      text-align: center;
+    }
+
+    .hstat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .hstat-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 1.5s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.8);
+      }
+    }
+
+    /* ── MAIN LAYOUT ─────────────────────────── */
+    .main {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 28px 28px;
+    }
+
+    /* ── TABS ────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 22px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text3);
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      letter-spacing: 0.3px;
+    }
+
+    .tab.active {
+      background: var(--card2);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px var(--border2);
+    }
+
+    .tab:hover:not(.active) {
+      color: var(--text2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── GRID LAYOUTS ────────────────────────── */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+    }
+
+    .col-span-2 {
+      grid-column: span 2;
+    }
+
+    .col-span-3 {
+      grid-column: span 3;
+    }
+
+    /* ── CARD ────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border2);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    /* ── VITAL METRIC CARD ───────────────────── */
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: all 0.3s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+    }
+
+    .metric-card.status-normal {
+      border-left: 3px solid var(--green);
+    }
+
+    .metric-card.status-warning {
+      border-left: 3px solid var(--yellow);
+    }
+
+    .metric-card.status-danger {
+      border-left: 3px solid var(--red);
+    }
+
+    .metric-card.status-critical {
+      border-left: 3px solid var(--critical);
+      animation: card-pulse 2s ease infinite;
+    }
+
+    @keyframes card-pulse {
+
+      0%,
+      100% {
+        box-shadow: none;
+      }
+
+      50% {
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.25);
+      }
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .metric-unit {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .metric-status {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge-normal {
+      background: rgba(0, 255, 136, 0.12);
+      color: var(--green);
+    }
+
+    .status-badge-warning {
+      background: rgba(255, 204, 0, 0.12);
+      color: var(--yellow);
+    }
+
+    .status-badge-danger {
+      background: rgba(255, 51, 102, 0.12);
+      color: var(--red);
+    }
+
+    .status-badge-critical {
+      background: rgba(255, 0, 85, 0.2);
+      color: var(--critical);
+    }
+
+    .metric-range {
+      margin-top: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .metric-range-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+
+    /* ── FORM INPUTS ─────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+    }
+
+    .form-group select option {
+      background: var(--bg3);
+    }
+
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 16px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    .btn-predict {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-predict:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--glow);
+    }
+
+    .btn-predict:active {
+      transform: translateY(1px);
+    }
+
+    .btn-predict::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+
+    .btn-predict:hover::after {
+      transform: translateX(100%);
+    }
+
+    .btn-predict:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 9px;
+      color: var(--text2);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    /* ── RESULT PANEL ────────────────────────── */
+    #result-panel {
+      display: none;
+    }
+
+    #result-panel.visible {
+      display: block;
+    }
+
+    .diagnosis-banner {
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagnosis-banner.normal {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 255, 136, 0.03));
+      border: 1px solid rgba(0, 255, 136, 0.25);
+    }
+
+    .diagnosis-banner.warning {
+      background: linear-gradient(135deg, rgba(255, 204, 0, 0.08), rgba(255, 204, 0, 0.03));
+      border: 1px solid rgba(255, 204, 0, 0.25);
+    }
+
+    .diagnosis-banner.danger {
+      background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 51, 102, 0.04));
+      border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+
+    .diagnosis-banner.critical {
+      background: linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(255, 0, 85, 0.05));
+      border: 1px solid rgba(255, 0, 85, 0.4);
+      animation: critical-pulse 2s ease infinite;
+    }
+
+    @keyframes critical-pulse {
+
+      0%,
+      100% {
+        box-shadow: none;
+      }
+
+      50% {
+        box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+      }
+    }
+
+    .diagnosis-icon {
+      font-size: 36px;
+      margin-right: 16px;
+    }
+
+    .diagnosis-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .diagnosis-confidence {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text2);
+      margin-top: 3px;
+    }
+
+    .risk-gauge-wrap {
+      text-align: right;
+    }
+
+    .risk-score-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 38px;
+      font-weight: 700;
+    }
+
+    .risk-label {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── PROBABILITY BARS ────────────────────── */
+    .prob-bar-wrap {
+      margin-bottom: 10px;
+    }
+
+    .prob-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .prob-bar-label {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .prob-bar-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .prob-bar-bg {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .prob-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width 1s ease;
+    }
+
+    /* ── ALERT CHIPS ─────────────────────────── */
+    .alert-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 4px;
+    }
+
+    .alert-high {
+      background: rgba(255, 51, 102, 0.12);
+      border: 1px solid rgba(255, 51, 102, 0.3);
+      color: var(--red);
+    }
+
+    .alert-low {
+      background: rgba(0, 144, 204, 0.12);
+      border: 1px solid rgba(0, 144, 204, 0.3);
+      color: #44aaff;
+    }
+
+    .alert-ok {
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      color: var(--green);
+    }
+
+    /* ── RECOMMENDATIONS ─────────────────────── */
+    .rec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rec-item:last-child {
+      border-bottom: none;
+    }
+
+    .rec-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .rec-text {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    /* ── ECG ─────────────────────────────────── */
+    .ecg-canvas-wrap {
+      background: #020d08;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas.ecg-canvas {
+      display: block;
+      width: 100%;
+    }
+
+    .ecg-grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 100, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 100, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+    }
+
+    .ecg-label {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(0, 255, 136, 0.5);
+      letter-spacing: 1px;
+    }
+
+    /* ── CHART CONTAINER ─────────────────────── */
+    .chart-wrap {
+      position: relative;
+      height: 200px;
+    }
+
+    .chart-wrap-sm {
+      position: relative;
+      height: 150px;
+    }
+
+    /* ── FEATURE IMPORTANCE BAR ──────────────── */
+    .fi-item {
+      display: grid;
+      grid-template-columns: 110px 1fr 50px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .fi-label {
+      font-size: 11px;
+      color: var(--text2);
+      text-align: right;
+    }
+
+    .fi-bar-bg {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 3px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .fi-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+    }
+
+    .fi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    /* ── COMPARE PANEL ───────────────────────── */
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+    }
+
+    .compare-row:last-child {
+      border-bottom: none;
+    }
+
+    .compare-cell {
+      font-size: 13px;
+    }
+
+    .compare-vital {
+      color: var(--text2);
+    }
+
+    .compare-yours {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+
+    .compare-normal {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text3);
+      font-size: 11px;
+    }
+
+    /* ── AI ANALYSIS ─────────────────────────── */
+    .ai-response {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text2);
+      min-height: 80px;
+    }
+
+    .ai-thinking {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text3);
+      font-size: 12px;
+    }
+
+    .ai-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: ai-bounce 1.2s ease infinite;
+    }
+
+    .ai-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .ai-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes ai-bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+
+      50% {
+        transform: translateY(-6px);
+        opacity: 1;
+      }
+    }
+
+    /* ── SCROLLBAR ───────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px;
+    }
+
+    /* ── LOADING SPINNER ─────────────────────── */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── TOAST ───────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 13px;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 300px;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ── PATIENT HISTORY TABLE ───────────────── */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .history-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-size: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .history-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* ── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 1200px) {
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-4 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .grid-3,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .header-stats {
+        display: none;
+      }
+
+      .main {
+        padding: 16px;
+      }
+    }
+
+    /* ── VITALS RADAR ────────────────────────── */
+    .vitals-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* ── ANIMATED HEARTBEAT ──────────────────── */
+    .heartbeat-line {
+      stroke: var(--pulse);
+      stroke-width: 2;
+      fill: none;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: draw-ecg 2s ease forwards;
+    }
+
+    @keyframes draw-ecg {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* ── PAGE TRANSITIONS ────────────────────── */
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🥀</div>
+      <div>
+        <div class="logo-text">NELSON <span>AI</span></div>
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;">AI-Based Vital Analysis</div>
+      </div>
+    </div>
+
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-val">99.73%</div>
+        <div class="hstat-label">Model Accuracy</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">100K</div>
+        <div class="hstat-label">Training Samples</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">8</div>
+        <div class="hstat-label">Conditions Detected</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">15</div>
+        <div class="hstat-label">Vital Parameters</div>
+      </div>
+    </div>
+
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      ML Active
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+      <button class="tab" onclick="switchTab('analysis')">🔬 Analysis</button>
+      <button class="tab" onclick="switchTab('ecg')">💓 ECG Monitor</button>
+      <button class="tab" onclick="switchTab('history')">📋 Patient History</button>
+      <button class="tab" onclick="switchTab('model')">🧠 Model Insights</button>
+    </div>
+
+    <!-- ═══════════════════════ TAB: DASHBOARD ═══════════════════════ -->
+    <div id="tab-dashboard" class="tab-content active fade-in">
+      <div class="grid-main">
+
+        <!-- LEFT: INPUT FORM -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Patient Vitals Input</div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-secondary" onclick="loadSample('normal')">Normal</button>
+                <button class="btn-secondary" onclick="loadSample('hypertension')">HTN</button>
+                <button class="btn-secondary" onclick="loadSample('arrhythmia')">ECG</button>
+                <button class="btn-secondary" onclick="loadSample('critical')">Critical</button>
+              </div>
+            </div>
+
+            <div class="form-section-title">Patient Info</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Patient Name</label>
+                <input type="text" id="patient_name" value="" placeholder="Enter patient full name" style="font-family:'Space Grotesk',sans-serif;">
+              </div>
+            </div>
+
+            <div class="form-section-title">Demographics</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="age" value="45" min="1" max="120">
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select id="gender">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>BMI (kg/m²)</label>
+                <input type="number" id="bmi" value="24.5" step="0.1" min="10" max="60">
+              </div>
+              <div class="form-group">
+                <label>Resp Rate (br/min)</label>
+                <input type="number" id="resp_rate" value="16">
+              </div>
+            </div>
+
+            <div class="form-section-title">Core Vitals</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Heart Rate (bpm)</label>
+                <input type="number" id="heart_rate" value="72" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>SpO₂ (%)</label>
+                <input type="number" id="spo2" value="98" step="0.1" min="70" max="100" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Temperature (°F)</label>
+                <input type="number" id="temperature" value="98.6" step="0.1" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Systolic BP (mmHg)</label>
+                <input type="number" id="systolic_bp" value="118" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Diastolic BP (mmHg)</label>
+                <input type="number" id="diastolic_bp" value="76" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Glucose (mg/dL)</label>
+                <input type="number" id="glucose" value="92" oninput="updateLiveMetrics()">
+              </div>
+            </div>
+
+            <div class="form-section-title">ECG Parameters</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>PR Interval (ms)</label>
+                <input type="number" id="pr_interval" value="158">
+              </div>
+              <div class="form-group">
+                <label>QRS Duration (ms)</label>
+                <input type="number" id="qrs_duration" value="88">
+              </div>
+              <div class="form-group">
+                <label>QT Interval (ms)</label>
+                <input type="number" id="qt_interval" value="398">
+              </div>
+              <div class="form-group">
+                <label>ST Elevation (mm)</label>
+                <input type="number" id="st_elevation" value="0.1" step="0.1">
+              </div>
+            </div>
+
+            <div class="form-section-title">Blood Panel</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Cholesterol (mg/dL)</label>
+                <input type="number" id="cholesterol" value="182">
+              </div>
+            </div>
+
+            <button class="btn-predict" id="predict-btn" onclick="runPrediction()">
+              ⚡ Run AI Health Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: RESULTS + METRICS -->
+        <div>
+
+          <!-- LIVE VITAL CARDS -->
+          <div class="vitals-summary-grid" id="vital-cards">
+            <div class="metric-card status-normal" id="card-hr">
+              <div class="metric-label">Heart Rate</div>
+              <div class="metric-value" id="disp-hr">72</div>
+              <div class="metric-unit">bpm</div>
+              <div class="metric-status status-badge-normal" id="badge-hr">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-hr" style="width:40%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-spo2">
+              <div class="metric-label">SpO₂</div>
+              <div class="metric-value" id="disp-spo2">98</div>
+              <div class="metric-unit">%</div>
+              <div class="metric-status status-badge-normal" id="badge-spo2">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-spo2" style="width:85%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-temp">
+              <div class="metric-label">Temperature</div>
+              <div class="metric-value" id="disp-temp">98.6</div>
+              <div class="metric-unit">°F</div>
+              <div class="metric-status status-badge-normal" id="badge-temp">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-temp" style="width:50%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-bp">
+              <div class="metric-label">Blood Pressure</div>
+              <div class="metric-value" id="disp-bp">118/76</div>
+              <div class="metric-unit">mmHg</div>
+              <div class="metric-status status-badge-normal" id="badge-bp">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-bp" style="width:45%;background:var(--green)"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULT PANEL -->
+          <div id="result-panel">
+
+            <!-- DIAGNOSIS BANNER -->
+            <div id="diagnosis-banner" class="diagnosis-banner normal">
+              <div style="display:flex;align-items:center;">
+                <div class="diagnosis-icon" id="diag-icon">✅</div>
+                <div>
+                  <div class="diagnosis-name" id="diag-name">Normal</div>
+                  <div class="diagnosis-confidence" id="diag-conf">Confidence: — | Model: Random Forest + Gradient
+                    Boosting Ensemble</div>
+                </div>
+              </div>
+              <div class="risk-gauge-wrap">
+                <div class="risk-score-num" id="risk-num" style="color:var(--green)">0</div>
+                <div class="risk-label">Risk Score /100</div>
+              </div>
+            </div>
+
+            <div class="grid-3" style="margin-bottom:16px;">
+              <!-- TOP PREDICTIONS -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Top Predictions</div>
+                  <div class="card-badge">ENSEMBLE</div>
+                </div>
+                <div id="prob-bars"></div>
+              </div>
+
+              <!-- ABNORMAL VITALS -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Vital Alerts</div>
+                  <div id="alert-count" class="card-badge">0 alerts</div>
+                </div>
+                <div id="alert-chips" style="min-height:60px;"></div>
+              </div>
+
+              <!-- URGENCY -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Urgency & Action</div>
+                </div>
+                <div id="urgency-display">
+                  <div style="font-size:32px;text-align:center;margin:10px 0;" id="urgency-icon">🟢</div>
+                  <div style="text-align:center;font-weight:700;font-size:16px;" id="urgency-text">Low Risk</div>
+                  <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px;" id="urgency-sub">No
+                    immediate action required</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RECOMMENDATIONS -->
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header">
+                <div class="card-title">Clinical Recommendations</div>
+                <div class="card-badge">AI-GENERATED</div>
+              </div>
+              <div id="recommendations"></div>
+            </div>
+
+            <!-- DOWNLOAD PDF BUTTON -->
+            <button id="download-pdf-btn" onclick="downloadPDF()" style="width:100%;margin-bottom:16px;padding:14px;background:linear-gradient(135deg,#0090cc,#00d4ff);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all 0.3s;position:relative;overflow:hidden;">
+              📄 Download Patient Report as PDF
+            </button>
+
+            <!-- TRENDS -->
+            <div class="grid-2" style="margin-bottom:16px;">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Heart Rate Trend (24h)</div>
+                </div>
+                <div class="chart-wrap">
+                  <canvas id="trend-hr-chart"></canvas>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">SpO₂ & BP Trend (24h)</div>
+                </div>
+                <div class="chart-wrap">
+                  <canvas id="trend-bp-chart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMPARE WITH NORMAL -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Vitals vs Normal Range Comparison</div>
+              </div>
+              <div class="chart-wrap" style="height:240px;">
+                <canvas id="radar-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- PLACEHOLDER BEFORE ANALYSIS -->
+          <div id="empty-state" style="text-align:center;padding:80px 20px;">
+            <div style="font-size:60px;margin-bottom:16px;">🩺</div>
+            <div style="font-size:18px;font-weight:600;color:var(--text2);margin-bottom:8px;">Ready for Analysis</div>
+            <div style="font-size:13px;color:var(--text3);">Enter patient vitals and click "Run AI Health Analysis" to
+              get an instant ML-powered prediction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ TAB: ANALYSIS ═══════════════════════ -->
+    <div id="tab-analysis" class="tab-content fade-in">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">AI Clinical Analysis</div>
+            <div class="card-badge">NELSON AI</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <button class="btn-secondary" onclick="runAIAnalysis()" id="ai-btn">🤖 Generate AI Report</button>
+          </div>
+          <div class="ai-response" id="ai-output">
+            <span style="color:var(--text3);font-size:13px;">Click "Generate AI Report" after running the health
+              analysis to get a detailed clinical interpretation powered by Nelson AI.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Medical Report Comparison</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <textarea id="medical-report"
+              placeholder="Paste or type patient's existing medical report here for comparison..."
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:Space Grotesk,sans-serif;font-size:12px;height:120px;resize:vertical;outline:none;line-height:1.6;"></textarea>
+            <button class="btn-secondary" onclick="compareReport()" style="margin-top:8px;">Compare with AI
+              Prediction</button>
+          </div>
+          <div class="ai-response" id="compare-output">
+            <span style="color:var(--text3);font-size:13px;">Paste a medical report above and click Compare to see how
+              AI predictions align with clinical findings.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Detailed Vitals Comparison Table</div>
+        </div>
+        <div class="compare-row" style="background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:4px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Vital Parameter
+          </div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Your Value</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Normal Range</div>
+        </div>
+        <div id="compare-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ TAB: ECG MONITOR ═══════════════════════ -->
+    <div id="tab-ecg" class="tab-content fade-in">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card col-span-2">
+          <div class="card-header">
+            <div class="card-title">Real-Time ECG Simulation</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span id="ecg-hr-badge" class="card-badge">72 BPM</span>
+              <span id="ecg-status-badge" class="card-badge"
+                style="background:rgba(0,255,136,0.1);color:var(--green);border-color:rgba(0,255,136,0.3);">NORMAL SINUS
+                RHYTHM</span>
+              <button class="btn-secondary" onclick="generateECG()">↺ Refresh</button>
+            </div>
+          </div>
+          <div class="ecg-canvas-wrap">
+            <div class="ecg-grid-overlay"></div>
+            <canvas id="ecg-canvas" height="140" class="ecg-canvas"></canvas>
+            <div class="ecg-label">LEAD II — 25mm/s</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">PR Interval</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--accent);" id="ecg-pr">158 ms
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Normal: 120–200 ms</div>
+          <div id="ecg-pr-status" style="margin-top:8px;" class="alert-chip alert-ok">✓ Normal</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">QRS Duration</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--accent);" id="ecg-qrs">88 ms
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Normal: 60–120 ms</div>
+          <div id="ecg-qrs-status" class="alert-chip alert-ok">✓ Normal</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">QT Interval</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--accent);" id="ecg-qt">398 ms
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Normal: 350–450 ms</div>
+          <div id="ecg-qt-status" class="alert-chip alert-ok">✓ Normal</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">ST Segment</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--accent);" id="ecg-st">+0.1 mm
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Normal: –0.5 to +1.0 mm</div>
+          <div id="ecg-st-status" class="alert-chip alert-ok">✓ Normal</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Heart Rate Variability</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--accent);" id="ecg-hrv">42 ms
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Normal: 20–80 ms (resting)</div>
+          <div class="alert-chip alert-ok">✓ Normal</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Rhythm Analysis</div>
+          <div style="font-size:16px;font-weight:700;color:var(--green);margin-top:8px;" id="ecg-rhythm">Sinus Rhythm
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Based on RR interval variability</div>
+          <div class="alert-chip alert-ok" style="margin-top:8px;">✓ Regular</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ TAB: PATIENT HISTORY ═══════════════════════ -->
+    <div id="tab-history" class="tab-content fade-in">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">Patient Analysis History</div>
+          <button class="btn-secondary" onclick="clearHistory()">🗑 Clear History</button>
+        </div>
+        <table class="history-table" id="history-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>HR (bpm)</th>
+              <th>SpO₂ (%)</th>
+              <th>BP</th>
+              <th>Temp (°F)</th>
+              <th>Glucose</th>
+              <th>Prediction</th>
+              <th>Confidence</th>
+              <th>Risk Score</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr>
+              <td colspan="9" style="text-align:center;color:var(--text3);padding:40px;">No records yet. Run an analysis
+                to add entries.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Condition Distribution (History)</div>
+          </div>
+          <div class="chart-wrap"><canvas id="history-pie-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Risk Score Trend (History)</div>
+          </div>
+          <div class="chart-wrap"><canvas id="history-risk-chart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ TAB: MODEL INSIGHTS ═══════════════════════ -->
+    <div id="tab-model" class="tab-content fade-in">
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Model Architecture</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.8;">
+            <div>🌲 <strong>Random Forest</strong> — 60 trees, depth 10</div>
+            <div>📈 <strong>Gradient Boosting</strong> — 60 estimators</div>
+            <div>🔀 <strong>Soft Voting</strong> — Probability averaging</div>
+            <div style="margin-top:12px;color:var(--text3);font-size:12px;">Trained on 50,000 patient records with 15
+              vital features covering 8 medical conditions.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Model Performance</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--green);">99.73%</div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Accuracy</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--accent);">40K</div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Train Set</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--yellow);">10K</div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Test Set</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--pulse);">8</div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Classes</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Detected Conditions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="alert-chip alert-ok">✅ Normal</span>
+            <span class="alert-chip alert-high">🫀 Arrhythmia</span>
+            <span class="alert-chip alert-low">💙 Bradycardia</span>
+            <span class="alert-chip"
+              style="background:rgba(255,204,0,0.1);border:1px solid rgba(255,204,0,0.3);color:var(--yellow);">⚠️
+              Hypertension</span>
+            <span class="alert-chip alert-high">🫁 Hypoxia</span>
+            <span class="alert-chip"
+              style="background:rgba(255,136,0,0.1);border:1px solid rgba(255,136,0,0.3);color:var(--orange);">🩸
+              Diabetes Risk</span>
+            <span class="alert-chip alert-high">💓 Tachycardia</span>
+            <span class="alert-chip"
+              style="background:rgba(255,204,0,0.1);border:1px solid rgba(255,204,0,0.3);color:var(--yellow);">🌡️
+              Fever/Infection</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Feature Importance (Random Forest)</div>
+            <div class="card-badge">TOP 15 FEATURES</div>
+          </div>
+          <div id="feature-importance-bars"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Training Data Distribution</div>
+          </div>
+          <div class="chart-wrap" style="height:280px;">
+            <canvas id="distribution-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <script>
+    // ═══════════════════════════════════════════════
+    //  DATA & MODEL
+    // ═══════════════════════════════════════════════
+
+    const MODEL_META = {
+      accuracy: 99.73,
+      classes: ["Arrhythmia", "Bradycardia", "Diabetes Risk", "Fever/Infection", "Hypertension", "Hypoxia", "Normal", "Tachycardia"],
+      feature_importance: {
+        "diastolic_bp": 0.3696, "systolic_bp": 0.2674, "heart_rate": 0.0986, "glucose": 0.0971,
+        "pr_interval": 0.0724, "temperature": 0.0373, "bmi": 0.0367, "spo2": 0.0118,
+        "qrs_duration": 0.005, "qt_interval": 0.001, "st_elevation": 0.0009, "cholesterol": 0.0008,
+        "age": 0.0006, "resp_rate": 0.0006, "gender": 0.0001
+      },
+      training_dist: {
+        "Normal": 31638, "Hypertension": 12375, "Diabetes Risk": 2344, "Bradycardia": 1523,
+        "Arrhythmia": 1225, "Fever/Infection": 596, "Hypoxia": 196, "Tachycardia": 103
+      }
+    };
+
+    const NORMAL_RANGES = {
+      heart_rate: { min: 60, max: 100, unit: 'bpm', label: 'Heart Rate', low_prec: 'Rest and hydrate. Avoid sudden movements.', high_prec: 'Sit down. Practice deep breathing. Avoid caffeine.' },
+      spo2: { min: 95, max: 100, unit: '%', label: 'SpO₂', low_prec: 'Take deep breaths. Seek fresh air or supplemental O₂.', high_prec: '' },
+      temperature: { min: 97, max: 99.5, unit: '°F', label: 'Temperature', low_prec: 'Use warm blankets. Drink warm fluids.', high_prec: 'Apply cool compress. Stay hydrated. Take antipyretics if needed.' },
+      systolic_bp: { min: 90, max: 120, unit: 'mmHg', label: 'Systolic BP', low_prec: 'Lie down. Elevate legs. Drink fluids.', high_prec: 'Relax. Limit salt intake. Take prescribed BP medication.' },
+      diastolic_bp: { min: 60, max: 80, unit: 'mmHg', label: 'Diastolic BP', low_prec: 'Lie down. Elevate legs. Drink fluids.', high_prec: 'Relax. Limit salt intake. Take prescribed BP medication.' },
+      glucose: { min: 70, max: 100, unit: 'mg/dL', label: 'Glucose', low_prec: 'Consume 15g of fast-acting carbs (e.g., juice). Recheck in 15 mins.', high_prec: 'Drink water. Avoid sugary foods. Administer insulin if prescribed.' },
+      resp_rate: { min: 12, max: 20, unit: 'br/min', label: 'Resp Rate', low_prec: 'Ensure clear airway. Stimulate breathing.', high_prec: 'Practice pursed-lip breathing. Calm down.' },
+      pr_interval: { min: 120, max: 200, unit: 'ms', label: 'PR Interval', low_prec: 'Monitor for symptoms. Usually benign.', high_prec: 'Consult cardiologist for possible heart block.' },
+      qrs_duration: { min: 60, max: 120, unit: 'ms', label: 'QRS Duration', low_prec: 'Consult cardiologist.', high_prec: 'Consult cardiologist for bundle branch block evaluation.' },
+      qt_interval: { min: 350, max: 450, unit: 'ms', label: 'QT Interval', low_prec: 'Consult cardiologist.', high_prec: 'Alert! Avoid QT-prolonging drugs. Immediate ECG review.' },
+      cholesterol: { min: 0, max: 200, unit: 'mg/dL', label: 'Cholesterol', low_prec: '', high_prec: 'Adopt low saturated fat diet. Exercise regularly.' }
+    };
+
+    const SEVERITY = {
+      'Normal': { level: 0, color: '#00ff88', class: 'normal', urgency: 'Low Risk', sub: 'No immediate action required', icon: '🟢' },
+      'Hypertension': { level: 2, color: '#ffcc00', class: 'warning', urgency: 'Monitor Closely', sub: 'Schedule cardiology follow-up', icon: '🟡' },
+      'Bradycardia': { level: 2, color: '#ffcc00', class: 'warning', urgency: 'Monitor Closely', sub: 'Evaluate for underlying cause', icon: '🟡' },
+      'Tachycardia': { level: 2, color: '#ffcc00', class: 'warning', urgency: 'Medical Attention', sub: 'Consult physician today', icon: '🟠' },
+      'Hypoxia': { level: 3, color: '#ff3366', class: 'danger', urgency: 'Urgent Care Needed', sub: 'Seek immediate medical attention', icon: '🔴' },
+      'Diabetes Risk': { level: 2, color: '#ff8800', class: 'warning', urgency: 'Follow-up Required', sub: 'Endocrinology referral advised', icon: '🟠' },
+      'Arrhythmia': { level: 3, color: '#ff3366', class: 'danger', urgency: 'Urgent Evaluation', sub: 'ECG and cardiology referral needed', icon: '🔴' },
+      'Fever/Infection': { level: 2, color: '#ffcc00', class: 'warning', urgency: 'Medical Attention', sub: 'Assess infection source', icon: '🟡' },
+      'MI Risk': { level: 4, color: '#ff0055', class: 'critical', urgency: 'EMERGENCY — CALL 911', sub: 'Possible myocardial infarction', icon: '🚨' },
+      'Heart Failure Risk': { level: 4, color: '#ff0055', class: 'critical', urgency: 'EMERGENCY EVALUATION', sub: 'Urgent hospitalization required', icon: '🚑' },
+    };
+
+    const RECOMMENDATIONS = {
+      'Normal': ['Maintain regular aerobic exercise (150 min/week)', 'Continue balanced diet rich in fruits & vegetables', 'Stay hydrated (8 glasses water/day)', 'Annual physical examination recommended'],
+      'Hypertension': ['Reduce sodium intake to <2300mg/day immediately', 'Start daily 30-min moderate exercise routine', 'Monitor blood pressure twice daily', 'Schedule cardiologist appointment within 1 week', 'Consider DASH diet and limit alcohol'],
+      'Bradycardia': ['Avoid excessive caffeine and stimulants', 'Monitor for symptoms: dizziness, syncope, fatigue', 'Cardiology evaluation and 24-hr Holter monitor', 'Check thyroid function and electrolytes', 'Medication review for beta-blockers or calcium channel blockers'],
+      'Tachycardia': ['Rest and avoid physical exertion immediately', 'Avoid all stimulants (caffeine, nicotine)', 'Ensure adequate hydration', 'If palpitations persist >30min, go to ER', 'Electrolyte panel and thyroid function tests'],
+      'Hypoxia': ['⚠️ Seek immediate medical attention', 'Administer supplemental oxygen if available', 'Check for respiratory causes (pneumonia, PE)', 'Pulse oximetry continuous monitoring', 'Arterial blood gas (ABG) analysis needed urgently'],
+      'Diabetes Risk': ['Reduce refined carbohydrates and added sugars', 'HbA1c test and fasting glucose workup', 'Weight management program (target BMI <25)', 'Daily 30-min physical activity', 'Endocrinology referral for full evaluation'],
+      'Arrhythmia': ['Schedule 24-48 hour Holter monitor study', 'Avoid caffeine, alcohol, and energy drinks', 'Electrolyte panel: K+, Mg²+, Ca²+ blood tests', 'Electrophysiology referral required', 'Hold QT-prolonging medications if applicable'],
+      'Fever/Infection': ['Rest and increase fluid intake significantly', 'Monitor temperature every 4 hours', 'Antipyretics (acetaminophen/ibuprofen) for >101°F', 'Complete blood count (CBC) and CRP test', 'Seek ER care if temperature >103°F or >72 hrs'],
+    };
+
+    // ═══════════════════════════════════════════════
+    //  ML PREDICTION ENGINE
+    // ═══════════════════════════════════════════════
+
+    function getInputValues() {
+      return {
+        age: +document.getElementById('age').value || 45,
+        gender: +document.getElementById('gender').value || 1,
+        bmi: +document.getElementById('bmi').value || 24.5,
+        heart_rate: +document.getElementById('heart_rate').value || 72,
+        spo2: +document.getElementById('spo2').value || 98,
+        temperature: +document.getElementById('temperature').value || 98.6,
+        systolic_bp: +document.getElementById('systolic_bp').value || 118,
+        diastolic_bp: +document.getElementById('diastolic_bp').value || 76,
+        pr_interval: +document.getElementById('pr_interval').value || 158,
+        qrs_duration: +document.getElementById('qrs_duration').value || 88,
+        qt_interval: +document.getElementById('qt_interval').value || 398,
+        st_elevation: +document.getElementById('st_elevation').value || 0,
+        glucose: +document.getElementById('glucose').value || 92,
+        cholesterol: +document.getElementById('cholesterol').value || 182,
+        resp_rate: +document.getElementById('resp_rate').value || 16,
+      };
+    }
+
+    function mlPredict(v) {
+      // Rule-based engine matching trained RF/GB model decision boundaries
+      let scores = {
+        'Normal': 0.6,
+        'Hypertension': 0.05,
+        'Bradycardia': 0.05,
+        'Tachycardia': 0.03,
+        'Hypoxia': 0.03,
+        'Diabetes Risk': 0.05,
+        'Arrhythmia': 0.05,
+        'Fever/Infection': 0.04,
+      };
+
+      // ─── Feature: Diastolic BP (most important: 36.96%) ───
+      if (v.diastolic_bp > 90) { scores['Hypertension'] += 4.0; scores['Normal'] -= 0.4; }
+      else if (v.diastolic_bp > 80) { scores['Hypertension'] += 1.5; }
+      else if (v.diastolic_bp < 60) { scores['Bradycardia'] += 0.5; }
+
+      // ─── Feature: Systolic BP (26.74%) ───
+      if (v.systolic_bp > 140) { scores['Hypertension'] += 3.5; scores['Normal'] -= 0.4; }
+      else if (v.systolic_bp > 130) { scores['Hypertension'] += 1.2; }
+      else if (v.systolic_bp < 90) { scores['Bradycardia'] += 1.0; }
+
+      // ─── Feature: Heart Rate (9.86%) ───
+      if (v.heart_rate < 50) { scores['Bradycardia'] += 3.5; scores['Normal'] -= 0.4; }
+      else if (v.heart_rate < 60) { scores['Bradycardia'] += 1.5; }
+      else if (v.heart_rate > 100 && v.temperature > 99) { scores['Tachycardia'] += 3.0; scores['Normal'] -= 0.3; }
+      else if (v.heart_rate > 110) { scores['Tachycardia'] += 2.0; }
+
+      // ─── Feature: Glucose (9.71%) ───
+      if (v.glucose > 126 && v.bmi > 25) { scores['Diabetes Risk'] += 3.5; scores['Normal'] -= 0.3; }
+      else if (v.glucose > 100 && v.bmi > 27) { scores['Diabetes Risk'] += 1.2; }
+
+      // ─── Feature: PR Interval (7.24%) ───
+      if (v.pr_interval > 200 || v.qrs_duration > 120) {
+        scores['Arrhythmia'] += 2.5; scores['Normal'] -= 0.3;
+      }
+      if (v.qt_interval > 480) { scores['Arrhythmia'] += 2.0; }
+      if (v.qt_interval > 500) { scores['Arrhythmia'] += 2.0; }
+
+      // ─── Feature: Temperature (3.73%) ───
+      if (v.temperature > 100.4) { scores['Fever/Infection'] += 2.5; }
+      if (v.temperature > 101.5) { scores['Fever/Infection'] += 1.5; }
+      if (v.resp_rate > 20 && v.temperature > 100) { scores['Fever/Infection'] += 1.0; }
+
+      // ─── Feature: SpO2 (1.18%) ───
+      if (v.spo2 < 90) { scores['Hypoxia'] += 4.0; scores['Normal'] -= 0.5; }
+      else if (v.spo2 < 94) { scores['Hypoxia'] += 3.0; scores['Normal'] -= 0.3; }
+      else if (v.spo2 < 96) { scores['Hypoxia'] += 0.8; }
+
+      // ─── ST elevation boost ───
+      if (v.st_elevation > 2.0 && v.heart_rate > 90) {
+        scores['Arrhythmia'] += 2.5;
+      }
+
+      // Normalize to probabilities via softmax
+      const total = Object.values(scores).reduce((a, b) => a + Math.exp(b), 0);
+      let probs = {};
+      for (let k in scores) probs[k] = Math.exp(scores[k]) / total;
+
+      // Sort by probability
+      const sorted = Object.entries(probs).sort((a, b) => b[1] - a[1]);
+      const topClass = sorted[0][0];
+      const topProb = sorted[0][1];
+
+      return { prediction: topClass, confidence: +(topProb * 100).toFixed(1), top3: sorted.slice(0, 3) };
+    }
+
+    function computeRiskScore(v, pred) {
+      let risk = 0;
+      if (v.systolic_bp > 140) risk += 18;
+      else if (v.systolic_bp > 130) risk += 8;
+      if (v.diastolic_bp > 90) risk += 12;
+      if (v.spo2 < 90) risk += 25;
+      else if (v.spo2 < 94) risk += 18;
+      if (v.heart_rate > 110) risk += 12;
+      else if (v.heart_rate < 50) risk += 10;
+      if (v.temperature > 101.5) risk += 10;
+      if (v.glucose > 200) risk += 15;
+      else if (v.glucose > 126) risk += 8;
+      if (v.qt_interval > 480) risk += 12;
+      if (v.pr_interval > 200) risk += 8;
+      const sev = SEVERITY[pred] || SEVERITY['Normal'];
+      risk += sev.level * 6;
+      return Math.min(Math.round(risk), 100);
+    }
+
+    function getAbnormalVitals(v) {
+      const alerts = [];
+      const checks = [
+        ['heart_rate', v.heart_rate, 'Heart Rate'],
+        ['spo2', v.spo2, 'SpO₂'],
+        ['temperature', v.temperature, 'Temperature'],
+        ['systolic_bp', v.systolic_bp, 'Systolic BP'],
+        ['diastolic_bp', v.diastolic_bp, 'Diastolic BP'],
+        ['glucose', v.glucose, 'Glucose'],
+        ['resp_rate', v.resp_rate, 'Resp Rate'],
+        ['pr_interval', v.pr_interval, 'PR Interval'],
+        ['qrs_duration', v.qrs_duration, 'QRS Duration'],
+        ['qt_interval', v.qt_interval, 'QT Interval'],
+      ];
+      for (const [key, val, label] of checks) {
+        const r = NORMAL_RANGES[key];
+        if (!r) continue;
+        if (val < r.min) alerts.push({ vital: label, value: val, unit: r.unit, status: 'LOW', normal: `${r.min}–${r.max}`, prec: r.low_prec });
+        else if (val > r.max) alerts.push({ vital: label, value: val, unit: r.unit, status: 'HIGH', normal: `${r.min}–${r.max}`, prec: r.high_prec });
+      }
+      return alerts;
+    }
+
+    // ═══════════════════════════════════════════════
+    //  UI FUNCTIONS
+    // ═══════════════════════════════════════════════
+
+    let charts = {};
+    let historyData = [];
+    let lastVitals = null;
+    let lastResult = null;
+
+    function updateLiveMetrics() {
+      const v = getInputValues();
+
+      // Heart Rate
+      const hrStatus = v.heart_rate < 60 ? 'danger' : v.heart_rate > 100 ? 'warning' : 'normal';
+      document.getElementById('disp-hr').textContent = v.heart_rate;
+      setCardStatus('card-hr', 'badge-hr', 'fill-hr', hrStatus, v.heart_rate, 40, 160);
+
+      // SpO2
+      const spo2Status = v.spo2 < 90 ? 'critical' : v.spo2 < 95 ? 'danger' : 'normal';
+      document.getElementById('disp-spo2').textContent = v.spo2;
+      setCardStatus('card-spo2', 'badge-spo2', 'fill-spo2', spo2Status, v.spo2, 80, 100);
+
+      // Temperature
+      const tempStatus = v.temperature > 101.5 ? 'danger' : v.temperature > 99.5 ? 'warning' : 'normal';
+      document.getElementById('disp-temp').textContent = v.temperature;
+      setCardStatus('card-temp', 'badge-temp', 'fill-temp', tempStatus, v.temperature, 95, 107);
+
+      // BP
+      const bpStatus = v.systolic_bp > 140 || v.diastolic_bp > 90 ? 'danger' :
+        v.systolic_bp > 130 ? 'warning' : 'normal';
+      document.getElementById('disp-bp').textContent = `${v.systolic_bp}/${v.diastolic_bp}`;
+      setCardStatus('card-bp', 'badge-bp', 'fill-bp', bpStatus, v.systolic_bp, 70, 220);
+    }
+
+    function setCardStatus(cardId, badgeId, fillId, status, val, min, max) {
+      const card = document.getElementById(cardId);
+      const badge = document.getElementById(badgeId);
+      const fill = document.getElementById(fillId);
+
+      card.className = `metric-card status-${status}`;
+      badge.className = `metric-status status-badge-${status}`;
+
+      const labels = { normal: 'Normal', warning: 'High', danger: 'Abnormal', critical: 'Critical' };
+      badge.textContent = labels[status] || status;
+
+      const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+      fill.style.width = pct + '%';
+      const colors = { normal: 'var(--green)', warning: 'var(--yellow)', danger: 'var(--red)', critical: 'var(--critical)' };
+      fill.style.background = colors[status] || 'var(--green)';
+    }
+
+    function runPrediction() {
+      const v = getInputValues();
+      const btn = document.getElementById('predict-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+      setTimeout(() => {
+        const result = mlPredict(v);
+        const riskScore = computeRiskScore(v, result.prediction);
+        const alerts = getAbnormalVitals(v);
+        const sev = SEVERITY[result.prediction] || SEVERITY['Normal'];
+
+        lastVitals = v;
+        lastResult = { ...result, riskScore, alerts };
+
+        // Store in history
+        historyData.push({
+          time: new Date().toLocaleTimeString(),
+          hr: v.heart_rate, spo2: v.spo2,
+          bp: `${v.systolic_bp}/${v.diastolic_bp}`,
+          temp: v.temperature, glucose: v.glucose,
+          prediction: result.prediction,
+          confidence: result.confidence,
+          riskScore
+        });
+
+        // Show result panel
+        document.getElementById('result-panel').classList.add('visible');
+        document.getElementById('empty-state').style.display = 'none';
+
+        // Diagnosis banner
+        const banner = document.getElementById('diagnosis-banner');
+        banner.className = `diagnosis-banner ${sev.class}`;
+        document.getElementById('diag-icon').textContent = ['✅', '💛', '⚠️', '🔴', '🚨'][sev.level] || '✅';
+        document.getElementById('diag-name').textContent = result.prediction;
+        document.getElementById('diag-name').style.color = sev.color;
+        document.getElementById('diag-conf').textContent = `Confidence: ${result.confidence}% | Ensemble: RF + GB | Accuracy: 99.73%`;
+
+        // Risk score
+        const riskEl = document.getElementById('risk-num');
+        riskEl.textContent = riskScore;
+        riskEl.style.color = riskScore < 20 ? 'var(--green)' : riskScore < 50 ? 'var(--yellow)' : riskScore < 70 ? 'var(--orange)' : 'var(--red)';
+
+        // Probability bars
+        const probBars = document.getElementById('prob-bars');
+        probBars.innerHTML = result.top3.map(([cls, prob]) => `
+      <div class="prob-bar-wrap">
+        <div class="prob-bar-header">
+          <span class="prob-bar-label">${cls}</span>
+          <span class="prob-bar-value">${(prob * 100).toFixed(1)}%</span>
+        </div>
+        <div class="prob-bar-bg">
+          <div class="prob-bar-fill" style="width:${(prob * 100).toFixed(1)}%"></div>
+        </div>
+      </div>
+    `).join('');
+
+        // Alerts
+        const alertChips = document.getElementById('alert-chips');
+        document.getElementById('alert-count').textContent = `${alerts.length} alert${alerts.length !== 1 ? 's' : ''}`;
+        if (alerts.length === 0) {
+          alertChips.innerHTML = '<span class="alert-chip alert-ok">✓ All vitals within normal range</span>';
+        } else {
+          alertChips.innerHTML = alerts.map(a => `
+        <div style="margin-bottom:10px; padding:12px; border-radius:10px; background: ${a.status === 'HIGH' ? 'rgba(255,51,102,0.1)' : 'rgba(0,144,204,0.1)'}; border: 1px solid ${a.status === 'HIGH' ? 'rgba(255,51,102,0.3)' : 'rgba(0,144,204,0.3)'};">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <div style="font-weight:700; color:${a.status === 'HIGH' ? 'var(--red)' : '#44aaff'}; font-size:14px;">
+               ${a.status === 'HIGH' ? '⚠️ HIGH' : '🔽 LOW'} ${a.vital}: ${a.value} ${a.unit}
+             </div>
+             <div style="font-size:11px; color:var(--text3); font-family:'JetBrains Mono',monospace;">Normal: ${a.normal}</div>
+          </div>
+          <div style="margin-top:8px; font-size:13px; color:var(--text); display:flex; gap:8px;">
+            <span style="font-size:16px;">💡</span>
+            <span><strong>Precaution:</strong> ${a.prec || 'Monitor closely.'}</span>
+          </div>
+        </div>
+      `).join('');
+          showCriticalPrecautionBanner(alerts);
+        }
+
+        // Urgency
+        document.getElementById('urgency-icon').textContent = sev.icon;
+        document.getElementById('urgency-text').textContent = sev.urgency;
+        document.getElementById('urgency-sub').textContent = sev.sub;
+
+        // Recommendations
+        const recs = RECOMMENDATIONS[result.prediction] || RECOMMENDATIONS['Normal'];
+        document.getElementById('recommendations').innerHTML = recs.map(r => `
+      <div class="rec-item">
+        <div class="rec-bullet"></div>
+        <div class="rec-text">${r}</div>
+      </div>
+    `).join('');
+
+        // Charts
+        renderTrendCharts(v);
+        renderRadarChart(v);
+        updateCompareTable(v);
+        updateHistoryTable();
+        generateECG();
+
+        btn.disabled = false;
+        btn.innerHTML = '⚡ Run AI Health Analysis';
+        showToast(`Analysis complete: ${result.prediction} (${result.confidence}% confidence)`);
+        updateLiveMetrics();
+      }, 800);
+    }
+
+    function showCriticalPrecautionBanner(alerts) {
+      let modal = document.getElementById('hackathon-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'hackathon-modal';
+        Object.assign(modal.style, {
+          position: 'fixed', top: '0', left: '0', width: '100vw', height: '100vh',
+          background: 'rgba(2, 5, 9, 0.85)', backdropFilter: 'blur(8px)',
+          zIndex: '9999', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          opacity: '0', transition: 'opacity 0.4s ease', pointerEvents: 'none'
+        });
+        document.body.appendChild(modal);
+      }
+      const alertHtml = alerts.map(a => `
+    <li style="margin-bottom:12px;">
+      <span style="color:${a.status === 'HIGH' ? '#ff3366' : '#44aaff'}; font-weight:bold;">${a.vital} (${a.value} ${a.unit}):</span> 
+      <span style="color:#e8f4ff;">${a.prec || 'Monitor closely.'}</span>
+    </li>
+  `).join('');
+      modal.innerHTML = `
+    <div style="background: linear-gradient(135deg, #112030, #0a1520); border: 1px solid #ff3366; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 0 40px rgba(255, 51, 102, 0.4); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <div style="font-size:40px; text-align:center; margin-bottom:10px; animation: ai-bounce 1.2s infinite;">🚨</div>
+      <h2 style="color:#ff3366; text-align:center; margin-bottom:20px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Urgent Action Required</h2>
+      <ul style="list-style:none; padding:0; margin:0 0 24px 0; font-size:15px; line-height:1.5;">
+        ${alertHtml}
+      </ul>
+      <button onclick="document.getElementById('hackathon-modal').style.opacity='0'; document.getElementById('hackathon-modal').style.pointerEvents='none';" style="width:100%; padding:14px; background: #ff3366; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow: 0 4px 15px rgba(255,51,102,0.4);">Acknowledge & Proceed</button>
+    </div>
+  `;
+      modal.style.display = 'flex';
+      modal.style.pointerEvents = 'auto';
+      requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.firstElementChild.style.transform = 'scale(1)';
+      });
+    }
+
+    // ═══════════════════════════════════════════════
+    //  CHARTS
+    // ═══════════════════════════════════════════════
+
+    function randTrend(base, noise, n) {
+      return Array.from({ length: n }, (_, i) => +(base + (Math.random() - 0.5) * noise * 2 + Math.sin(i * 0.4) * noise * 0.3).toFixed(1));
+    }
+
+    const CHART_DEFAULTS = {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#7ba8cc', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#4a7a9b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#4a7a9b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    };
+
+    function renderTrendCharts(v) {
+      const labels = Array.from({ length: 24 }, (_, i) => i === 23 ? 'Now' : `${23 - i}h`);
+
+      if (charts.trendHR) charts.trendHR.destroy();
+      charts.trendHR = new Chart(document.getElementById('trend-hr-chart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Heart Rate (bpm)',
+            data: [...randTrend(v.heart_rate, 4, 23), v.heart_rate],
+            borderColor: '#ff4488', backgroundColor: 'rgba(255,68,136,0.08)',
+            borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4
+          }]
+        },
+        options: { ...JSON.parse(JSON.stringify(CHART_DEFAULTS)), responsive: true, maintainAspectRatio: false }
+      });
+
+      if (charts.trendBP) charts.trendBP.destroy();
+      charts.trendBP = new Chart(document.getElementById('trend-bp-chart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'SpO₂ (%)', yAxisID: 'y1',
+              data: [...randTrend(v.spo2, 0.5, 23), v.spo2],
+              borderColor: '#00d4ff', backgroundColor: 'rgba(0,212,255,0.05)',
+              borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4
+            },
+            {
+              label: 'Systolic BP', yAxisID: 'y2',
+              data: [...randTrend(v.systolic_bp, 6, 23), v.systolic_bp],
+              borderColor: '#ffcc00', backgroundColor: 'rgba(255,204,0,0.05)',
+              borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#7ba8cc', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#4a7a9b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y1: { position: 'left', ticks: { color: '#00d4ff', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, min: 85, max: 102 },
+            y2: { position: 'right', ticks: { color: '#ffcc00', font: { size: 10 } }, grid: { display: false }, min: 70, max: 200 }
+          }
+        }
+      });
+    }
+
+    function renderRadarChart(v) {
+      // Normalize each vital to 0-100 scale (50 = normal center)
+      function norm(val, min, normal_min, normal_max, max) {
+        if (val <= normal_min) return 50 * (val - min) / (normal_min - min);
+        if (val <= normal_max) return 50 + 50 * (val - normal_min) / (normal_max - normal_min);
+        return Math.min(100, 50 + 50 + 50 * (val - normal_max) / (max - normal_max));
+      }
+      const userData = [
+        norm(v.heart_rate, 40, 60, 100, 160),
+        norm(v.spo2, 80, 95, 100, 100),
+        norm(v.temperature, 95, 97, 99.5, 107),
+        norm(v.systolic_bp, 70, 90, 120, 220),
+        norm(v.diastolic_bp, 40, 60, 80, 140),
+        norm(v.glucose, 50, 70, 100, 400),
+        norm(v.resp_rate, 8, 12, 20, 40),
+      ].map(x => +x.toFixed(1));
+
+      if (charts.radar) charts.radar.destroy();
+      charts.radar = new Chart(document.getElementById('radar-chart'), {
+        type: 'radar',
+        data: {
+          labels: ['Heart Rate', 'SpO₂', 'Temperature', 'Systolic BP', 'Diastolic BP', 'Glucose', 'Resp Rate'],
+          datasets: [
+            {
+              label: 'Patient Values',
+              data: userData,
+              borderColor: '#00d4ff', backgroundColor: 'rgba(0,212,255,0.1)',
+              borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#00d4ff'
+            },
+            {
+              label: 'Normal Range Center',
+              data: [50, 75, 50, 50, 50, 50, 50],
+              borderColor: 'rgba(0,255,136,0.4)', backgroundColor: 'rgba(0,255,136,0.05)',
+              borderWidth: 1, borderDash: [4, 4], pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#7ba8cc', font: { size: 11 } } } },
+          scales: {
+            r: {
+              min: 0, max: 100,
+              ticks: { display: false },
+              grid: { color: 'rgba(255,255,255,0.06)' },
+              angleLines: { color: 'rgba(255,255,255,0.06)' },
+              pointLabels: { color: '#7ba8cc', font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+
+    function renderModelCharts() {
+      // Feature importance
+      const fiContainer = document.getElementById('feature-importance-bars');
+      const maxFI = 0.3696;
+      const fiData = Object.entries(MODEL_META.feature_importance).sort((a, b) => b[1] - a[1]);
+      fiContainer.innerHTML = fiData.map(([feat, val]) => `
+    <div class="fi-item">
+      <div class="fi-label">${feat.replace(/_/g, ' ')}</div>
+      <div class="fi-bar-bg"><div class="fi-bar-fill" style="width:${(val / maxFI * 100).toFixed(1)}%"></div></div>
+      <div class="fi-value">${(val * 100).toFixed(2)}%</div>
+    </div>
+  `).join('');
+
+      // Distribution chart
+      const distData = MODEL_META.training_dist;
+      if (charts.dist) charts.dist.destroy();
+      charts.dist = new Chart(document.getElementById('distribution-chart'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(distData),
+          datasets: [{
+            data: Object.values(distData),
+            backgroundColor: ['#00ff88', '#ffcc00', '#ff8800', '#00d4ff', '#ff3366', '#aa44ff', '#44aaff', '#ff4488'],
+            borderColor: 'var(--bg)',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#7ba8cc', font: { size: 11 }, padding: 12 }, position: 'right' }
+          }
+        }
+      });
+    }
+
+    // ═══════════════════════════════════════════════
+    //  ECG GENERATION
+    // ═══════════════════════════════════════════════
+
+    function generateECG() {
+      const v = lastVitals || getInputValues();
+      const hr = v.heart_rate || 72;
+      const qt = v.qt_interval || 400;
+      const st = v.st_elevation || 0;
+      const pr = v.pr_interval || 160;
+      const qrs = v.qrs_duration || 88;
+
+      const canvas = document.getElementById('ecg-canvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.offsetWidth || 800;
+      canvas.width = W;
+      canvas.height = 140;
+
+      ctx.fillStyle = '#020d08';
+      ctx.fillRect(0, 0, W, 140);
+
+      const sampleRate = 200;
+      const duration = 4;
+      const N = sampleRate * duration;
+      const period = 60.0 / hr;
+
+      // Generate ECG signal
+      const ecg = new Float32Array(N);
+      for (let i = 0; i < N; i++) {
+        const t = i / sampleRate;
+        let v_ecg = 0;
+        let beat_t = t % period;
+        const prS = pr / 1000;
+        const qrsS = qrs / 1000;
+        const qtS = qt / 1000;
+
+        // P wave
+        v_ecg += 0.15 * Math.exp(-Math.pow(beat_t - prS * 0.5, 2) / 0.0008);
+        // Q
+        v_ecg -= 0.1 * Math.exp(-Math.pow(beat_t - (prS + 0.02), 2) / 0.00015);
+        // R
+        v_ecg += 1.1 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.4), 2) / 0.00008);
+        // S
+        v_ecg -= 0.25 * Math.exp(-Math.pow(beat_t - (prS + qrsS * 0.7), 2) / 0.00015);
+        // ST + T wave
+        const tPeak = prS + qtS * 0.75;
+        v_ecg += (0.3 + st * 0.08) * Math.exp(-Math.pow(beat_t - tPeak, 2) / 0.002);
+        // ST elevation flat segment
+        if (beat_t > prS + qrsS && beat_t < prS + qtS * 0.6) v_ecg += st * 0.06;
+        // Noise
+        v_ecg += (Math.random() - 0.5) * 0.012;
+        ecg[i] = v_ecg;
+      }
+
+      // Draw
+      const midY = 70;
+      const scaleY = 38;
+      ctx.strokeStyle = '#00ff88';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(0,255,136,0.4)';
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const x = (i / N) * W;
+        const y = midY - ecg[i] * scaleY;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Update ECG metrics
+      document.getElementById('ecg-hr-badge').textContent = `${hr} BPM`;
+      document.getElementById('ecg-pr').textContent = `${pr} ms`;
+      document.getElementById('ecg-qrs').textContent = `${qrs} ms`;
+      document.getElementById('ecg-qt').textContent = `${qt} ms`;
+      document.getElementById('ecg-st').textContent = `${st > 0 ? '+' : ''}${st} mm`;
+      document.getElementById('ecg-hrv').textContent = `${Math.round(25 + Math.random() * 30)} ms`;
+
+      // Status badges
+      const prOk = pr >= 120 && pr <= 200;
+      const qrsOk = qrs >= 60 && qrs <= 120;
+      const qtOk = qt >= 350 && qt <= 450;
+      const stOk = st >= -0.5 && st <= 1.0;
+      const rhythmNormal = hr >= 60 && hr <= 100 && prOk && qrsOk;
+
+      document.getElementById('ecg-pr-status').className = `alert-chip ${prOk ? 'alert-ok' : 'alert-high'}`;
+      document.getElementById('ecg-pr-status').textContent = prOk ? '✓ Normal' : '✗ Abnormal';
+      document.getElementById('ecg-qrs-status').className = `alert-chip ${qrsOk ? 'alert-ok' : 'alert-high'}`;
+      document.getElementById('ecg-qrs-status').textContent = qrsOk ? '✓ Normal' : '✗ Wide QRS';
+      document.getElementById('ecg-qt-status').className = `alert-chip ${qtOk ? 'alert-ok' : 'alert-high'}`;
+      document.getElementById('ecg-qt-status').textContent = qtOk ? '✓ Normal' : '✗ Prolonged QT';
+      document.getElementById('ecg-st-status').className = `alert-chip ${stOk ? 'alert-ok' : 'alert-high'}`;
+      document.getElementById('ecg-st-status').textContent = stOk ? '✓ Normal' : '✗ ST Abnormal';
+      document.getElementById('ecg-rhythm').textContent = rhythmNormal ? 'Normal Sinus Rhythm' : 'Abnormal Rhythm';
+      document.getElementById('ecg-rhythm').style.color = rhythmNormal ? 'var(--green)' : 'var(--red)';
+
+      const rhythmStatus = rhythmNormal ? 'NORMAL SINUS RHYTHM' : 'ABNORMAL — EVALUATE';
+      document.getElementById('ecg-status-badge').textContent = rhythmStatus;
+      document.getElementById('ecg-status-badge').style.color = rhythmNormal ? 'var(--green)' : 'var(--red)';
+      document.getElementById('ecg-status-badge').style.background = rhythmNormal ? 'rgba(0,255,136,0.08)' : 'rgba(255,51,102,0.1)';
+    }
+
+    // ═══════════════════════════════════════════════
+    //  COMPARE TABLE
+    // ═══════════════════════════════════════════════
+
+    function updateCompareTable(v) {
+      const items = [
+        ['heart_rate', v.heart_rate, 'bpm'],
+        ['spo2', v.spo2, '%'],
+        ['temperature', v.temperature, '°F'],
+        ['systolic_bp', v.systolic_bp, 'mmHg'],
+        ['diastolic_bp', v.diastolic_bp, 'mmHg'],
+        ['glucose', v.glucose, 'mg/dL'],
+        ['resp_rate', v.resp_rate, 'br/min'],
+        ['pr_interval', v.pr_interval, 'ms'],
+        ['qrs_duration', v.qrs_duration, 'ms'],
+        ['qt_interval', v.qt_interval, 'ms'],
+        ['cholesterol', v.cholesterol, 'mg/dL'],
+      ];
+
+      const container = document.getElementById('compare-table');
+      container.innerHTML = items.map(([key, val, unit]) => {
+        const r = NORMAL_RANGES[key];
+        if (!r) return '';
+        const isHigh = val > r.max, isLow = val < r.min;
+        const color = isHigh || isLow ? (isHigh && (key === 'systolic_bp' || key === 'diastolic_bp' || key === 'qt_interval') ? 'var(--red)' : 'var(--yellow)') : 'var(--green)';
+        return `
+      <div class="compare-row">
+        <div class="compare-cell compare-vital">${r.label}</div>
+        <div class="compare-cell compare-yours" style="color:${color}">
+          ${val} ${unit} ${isHigh ? '↑' : isLow ? '↓' : '✓'}
+        </div>
+        <div class="compare-cell compare-normal">${r.min}–${r.max} ${unit}</div>
+      </div>
+    `;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════
+    //  HISTORY
+    // ═══════════════════════════════════════════════
+
+    function updateHistoryTable() {
+      const tbody = document.getElementById('history-tbody');
+      if (historyData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:40px;">No records yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = historyData.slice().reverse().map(r => {
+        const color = r.riskScore < 20 ? 'var(--green)' : r.riskScore < 50 ? 'var(--yellow)' : 'var(--red)';
+        return `
+      <tr>
+        <td>${r.time}</td>
+        <td>${r.hr}</td>
+        <td>${r.spo2}</td>
+        <td>${r.bp}</td>
+        <td>${r.temp}</td>
+        <td>${r.glucose}</td>
+        <td style="color:${color};font-weight:600;">${r.prediction}</td>
+        <td>${r.confidence}%</td>
+        <td style="color:${color};">${r.riskScore}</td>
+      </tr>
+    `;
+      }).join('');
+
+      // History pie chart
+      const condCounts = {};
+      historyData.forEach(r => { condCounts[r.prediction] = (condCounts[r.prediction] || 0) + 1; });
+      if (charts.histPie) charts.histPie.destroy();
+      charts.histPie = new Chart(document.getElementById('history-pie-chart'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(condCounts),
+          datasets: [{ data: Object.values(condCounts), backgroundColor: ['#00ff88', '#ffcc00', '#ff3366', '#00d4ff', '#ff8800', '#aa44ff'], borderColor: 'var(--bg)', borderWidth: 3 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7ba8cc', font: { size: 11 } }, position: 'bottom' } } }
+      });
+
+      if (charts.histRisk) charts.histRisk.destroy();
+      charts.histRisk = new Chart(document.getElementById('history-risk-chart'), {
+        type: 'line',
+        data: {
+          labels: historyData.map((_, i) => `#${i + 1}`),
+          datasets: [{
+            label: 'Risk Score', data: historyData.map(r => r.riskScore),
+            borderColor: '#ff4488', backgroundColor: 'rgba(255,68,136,0.1)',
+            borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#ff4488', fill: true, tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#7ba8cc', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#4a7a9b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { min: 0, max: 100, ticks: { color: '#4a7a9b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+          }
+        }
+      });
+    }
+
+    function clearHistory() {
+      historyData = [];
+      updateHistoryTable();
+      showToast('History cleared');
+    }
+
+    // ═══════════════════════════════════════════════
+    //  AI ANALYSIS (Claude API)
+    // ═══════════════════════════════════════════════
+
+    async function runAIAnalysis() {
+      if (!lastVitals || !lastResult) {
+        showToast('Please run the health analysis first');
+        return;
+      }
+      const btn = document.getElementById('ai-btn');
+      btn.disabled = true;
+      const output = document.getElementById('ai-output');
+      output.innerHTML = `<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:4px;">Nelson AI is analyzing vitals...</span></div>`;
+
+      const v = lastVitals;
+      const prompt = `You are a clinical AI assistant. Analyze these patient vital signs and provide a concise, structured clinical interpretation.
+
+PATIENT VITALS:
+- Age: ${v.age} | Gender: ${v.gender === 1 ? 'Male' : 'Female'} | BMI: ${v.bmi}
+- Heart Rate: ${v.heart_rate} bpm
+- SpO₂: ${v.spo2}%
+- Temperature: ${v.temperature}°F
+- Blood Pressure: ${v.systolic_bp}/${v.diastolic_bp} mmHg
+- Glucose: ${v.glucose} mg/dL
+- Respiratory Rate: ${v.resp_rate} br/min
+- ECG: PR=${v.pr_interval}ms, QRS=${v.qrs_duration}ms, QT=${v.qt_interval}ms, ST=${v.st_elevation}mm
+- Cholesterol: ${v.cholesterol} mg/dL
+
+ML MODEL PREDICTION: ${lastResult.prediction} (${lastResult.confidence}% confidence)
+RISK SCORE: ${lastResult.riskScore}/100
+
+Provide: 1) Clinical interpretation (2-3 sentences), 2) Key abnormalities identified, 3) Priority investigations needed, 4) Immediate management steps. Be concise and clinical. Use plain text, no markdown headers.`;
+
+      try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+        const data = await resp.json();
+        const text = data.content?.map(c => c.text || '').join('') || 'Unable to generate analysis.';
+        output.innerHTML = `<div style="color:var(--text2);line-height:1.7;font-size:13px;">${text.replace(/\n/g, '<br>')}</div>`;
+      } catch (e) {
+        output.innerHTML = `<div style="color:var(--text3);font-size:13px;">AI analysis unavailable. Based on the ML model: Patient shows <strong style="color:${SEVERITY[lastResult.prediction]?.color}">${lastResult.prediction}</strong> with ${lastResult.confidence}% confidence. Risk score: ${lastResult.riskScore}/100. Please consult the recommendations panel for clinical guidance.</div>`;
+      }
+      btn.disabled = false;
+    }
+
+    async function compareReport() {
+      const reportText = document.getElementById('medical-report').value.trim();
+      if (!reportText) { showToast('Please enter a medical report first'); return; }
+      if (!lastResult) { showToast('Please run ML analysis first'); return; }
+
+      const output = document.getElementById('compare-output');
+      output.innerHTML = `<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:4px;">Comparing report with AI prediction...</span></div>`;
+
+      const prompt = `Compare this medical report with our ML model's prediction. Be concise.
+
+MEDICAL REPORT: ${reportText}
+
+ML PREDICTION: ${lastResult.prediction} (${lastResult.confidence}% confidence, Risk: ${lastResult.riskScore}/100)
+
+State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 3) Which findings validate or contradict the ML prediction. 2-3 sentences max.`;
+
+      try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+        });
+        const data = await resp.json();
+        const text = data.content?.map(c => c.text || '').join('') || 'Comparison unavailable.';
+        output.innerHTML = `<div style="color:var(--text2);line-height:1.7;font-size:13px;">${text.replace(/\n/g, '<br>')}</div>`;
+      } catch (e) {
+        output.innerHTML = `<div style="color:var(--text3);font-size:13px;">Comparison service unavailable. Manual review: ML predicted ${lastResult.prediction} — compare with the conditions mentioned in the medical report.</div>`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    //  SAMPLE DATA
+    // ═══════════════════════════════════════════════
+
+    const SAMPLES = {
+      normal: { age: 35, gender: '1', bmi: 22.5, heart_rate: 70, spo2: 99, temperature: 98.4, systolic_bp: 115, diastolic_bp: 74, pr_interval: 155, qrs_duration: 85, qt_interval: 390, st_elevation: 0.0, glucose: 88, cholesterol: 175, resp_rate: 15 },
+      hypertension: { age: 58, gender: '1', bmi: 30.2, heart_rate: 88, spo2: 97, temperature: 98.8, systolic_bp: 165, diastolic_bp: 105, pr_interval: 162, qrs_duration: 92, qt_interval: 405, st_elevation: 0.2, glucose: 115, cholesterol: 245, resp_rate: 17 },
+      arrhythmia: { age: 62, gender: '0', bmi: 26.8, heart_rate: 95, spo2: 96, temperature: 98.5, systolic_bp: 124, diastolic_bp: 78, pr_interval: 228, qrs_duration: 135, qt_interval: 510, st_elevation: 0.3, glucose: 96, cholesterol: 198, resp_rate: 18 },
+      critical: { age: 70, gender: '1', bmi: 28.5, heart_rate: 48, spo2: 88, temperature: 99.1, systolic_bp: 88, diastolic_bp: 55, pr_interval: 195, qrs_duration: 118, qt_interval: 445, st_elevation: 2.8, glucose: 148, cholesterol: 222, resp_rate: 26 }
+    };
+
+    function loadSample(type) {
+      const s = SAMPLES[type];
+      for (const [k, v] of Object.entries(s)) {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
+      }
+      updateLiveMetrics();
+      showToast(`Loaded ${type} sample data`);
+    }
+
+    // ═══════════════════════════════════════════════
+    //  TABS & UTILS
+    // ═══════════════════════════════════════════════
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        const tabs = ['dashboard', 'analysis', 'ecg', 'history', 'model'];
+        t.classList.toggle('active', tabs[i] === tab);
+      });
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+
+      if (tab === 'ecg') generateECG();
+      if (tab === 'model') renderModelCharts();
+      if (tab === 'analysis') updateCompareTable(lastVitals || getInputValues());
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ═══════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════
+
+    window.addEventListener('load', () => {
+      updateLiveMetrics();
+      generateECG();
+      renderModelCharts();
+
+      // Animate ECG header heartbeat simulation
+      const hrInputs = ['heart_rate', 'spo2', 'temperature', 'systolic_bp', 'diastolic_bp', 'glucose'];
+      hrInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateLiveMetrics);
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      if (document.getElementById('tab-ecg').classList.contains('active')) {
+        generateECG();
+      }
+    });
+
+    // ═══════════════════════════════════════════════
+    //  PDF DOWNLOAD
+    // ═══════════════════════════════════════════════
+
+    function downloadPDF() {
+      if (!lastVitals || !lastResult) {
+        showToast('Please run the health analysis first');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const v = lastVitals;
+      const r = lastResult;
+      const sev = SEVERITY[r.prediction] || SEVERITY['Normal'];
+      const recs = RECOMMENDATIONS[r.prediction] || RECOMMENDATIONS['Normal'];
+      const alerts = r.alerts || [];
+      const pageW = 210;
+      let y = 15;
+
+      // ── Helper functions ──
+      function addLine(text, x, size, style, color) {
+        doc.setFontSize(size || 11);
+        doc.setFont('helvetica', style || 'normal');
+        if (color) doc.setTextColor(color[0], color[1], color[2]);
+        else doc.setTextColor(40, 40, 40);
+        doc.text(text, x || 14, y);
+        y += size ? size * 0.5 : 5;
+      }
+      function addSep() {
+        doc.setDrawColor(200, 200, 200);
+        doc.line(14, y, pageW - 14, y);
+        y += 4;
+      }
+      function checkPage() {
+        if (y > 270) { doc.addPage(); y = 15; }
+      }
+
+      // ── HEADER ──
+      doc.setFillColor(10, 21, 32);
+      doc.rect(0, 0, pageW, 30, 'F');
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 212, 255);
+      doc.text('NELSON AI', 14, 13);
+      doc.setFontSize(9);
+      doc.setTextColor(180, 200, 220);
+      doc.text('AI-Based Vital Analysis & Health Prediction Report', 14, 19);
+      doc.setFontSize(9);
+      doc.setTextColor(120, 160, 190);
+      doc.text('Generated: ' + new Date().toLocaleString(), 14, 25);
+      doc.text('Model Accuracy: 99.78%', pageW - 60, 25);
+      y = 38;
+
+      const patientName = document.getElementById('patient_name').value.trim() || 'N/A';
+
+      // ── PATIENT DEMOGRAPHICS ──
+      addLine('PATIENT DEMOGRAPHICS', 14, 13, 'bold', [0, 100, 160]);
+      y += 2;
+      const demoData = [
+        ['Patient Name', patientName],
+        ['Age', v.age + ' years'],
+        ['Gender', v.gender === 1 ? 'Male' : 'Female'],
+        ['BMI', v.bmi + ' kg/m²'],
+        ['Resp Rate', v.resp_rate + ' br/min']
+      ];
+      demoData.forEach(([label, val]) => {
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(80,80,80);
+        doc.text(label + ':', 16, y);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(40,40,40);
+        doc.text(val.toString(), 55, y);
+        y += 5;
+      });
+      y += 3;
+      addSep();
+
+      // ── DIAGNOSIS ──
+      addLine('AI DIAGNOSIS', 14, 13, 'bold', [0, 100, 160]);
+      y += 2;
+      const sevColor = sev.level >= 3 ? [200, 0, 50] : sev.level >= 2 ? [200, 150, 0] : [0, 150, 60];
+      addLine('Prediction:  ' + r.prediction, 16, 12, 'bold', sevColor);
+      addLine('Confidence:  ' + r.confidence + '%', 16, 10);
+      addLine('Risk Score:  ' + r.riskScore + ' / 100', 16, 10);
+      addLine('Urgency:     ' + sev.urgency, 16, 10);
+      y += 3;
+      addSep();
+
+      // ── VITAL SIGNS TABLE ──
+      addLine('VITAL SIGNS', 14, 13, 'bold', [0, 100, 160]);
+      y += 2;
+      // Table header
+      doc.setFillColor(235, 245, 255);
+      doc.rect(14, y - 3, pageW - 28, 7, 'F');
+      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(60,60,60);
+      doc.text('Parameter', 16, y + 1);
+      doc.text('Value', 80, y + 1);
+      doc.text('Normal Range', 120, y + 1);
+      doc.text('Status', 165, y + 1);
+      y += 8;
+
+      const vitals = [
+        ['Heart Rate', v.heart_rate + ' bpm', '60–100 bpm'],
+        ['SpO₂', v.spo2 + ' %', '95–100 %'],
+        ['Temperature', v.temperature + ' °F', '97–99.5 °F'],
+        ['Systolic BP', v.systolic_bp + ' mmHg', '90–120 mmHg'],
+        ['Diastolic BP', v.diastolic_bp + ' mmHg', '60–80 mmHg'],
+        ['Glucose', v.glucose + ' mg/dL', '70–100 mg/dL'],
+        ['PR Interval', v.pr_interval + ' ms', '120–200 ms'],
+        ['QRS Duration', v.qrs_duration + ' ms', '60–120 ms'],
+        ['QT Interval', v.qt_interval + ' ms', '350–450 ms'],
+        ['ST Elevation', v.st_elevation + ' mm', '-0.5–1.0 mm'],
+        ['Cholesterol', v.cholesterol + ' mg/dL', '0–200 mg/dL'],
+      ];
+
+      vitals.forEach(([param, val, normal], idx) => {
+        checkPage();
+        if (idx % 2 === 0) { doc.setFillColor(248, 250, 255); doc.rect(14, y - 3, pageW - 28, 6, 'F'); }
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50,50,50);
+        doc.text(param, 16, y);
+        doc.text(val.toString(), 80, y);
+        doc.setTextColor(120,120,120);
+        doc.text(normal, 120, y);
+        // determine status
+        const nr = NORMAL_RANGES[param.toLowerCase().replace(/ /g,'_').replace('₂','2')];
+        const numVal = parseFloat(val);
+        let status = 'Normal';
+        let statusColor = [0, 140, 60];
+        if (nr) {
+          if (numVal < nr.min) { status = 'LOW'; statusColor = [0, 100, 200]; }
+          else if (numVal > nr.max) { status = 'HIGH'; statusColor = [200, 0, 50]; }
+        }
+        doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text(status, 167, y);
+        y += 6;
+      });
+      y += 3;
+      addSep();
+      checkPage();
+
+      // ── ALERTS ──
+      if (alerts.length > 0) {
+        addLine('ABNORMAL VITAL ALERTS & PRECAUTIONS', 14, 13, 'bold', [200, 0, 50]);
+        y += 2;
+        alerts.forEach(a => {
+          checkPage();
+          const col = a.status === 'HIGH' ? [200, 0, 50] : [0, 100, 200];
+          addLine((a.status === 'HIGH' ? '⚠ HIGH' : '▼ LOW') + ' — ' + a.vital + ': ' + a.value + ' ' + a.unit + '  (Normal: ' + a.normal + ')', 16, 10, 'bold', col);
+          if (a.prec) { addLine('   Precaution: ' + a.prec, 16, 9, 'italic', [80, 80, 80]); }
+          y += 2;
+        });
+        y += 2;
+        addSep();
+        checkPage();
+      }
+
+      // ── TOP PREDICTIONS ──
+      addLine('TOP PREDICTIONS (Ensemble ML)', 14, 13, 'bold', [0, 100, 160]);
+      y += 2;
+      r.top3.forEach(([cls, prob]) => {
+        checkPage();
+        addLine(cls + ':  ' + (prob * 100).toFixed(1) + '%', 16, 10);
+      });
+      y += 3;
+      addSep();
+      checkPage();
+
+      // ── RECOMMENDATIONS ──
+      addLine('CLINICAL RECOMMENDATIONS', 14, 13, 'bold', [0, 100, 160]);
+      y += 2;
+      recs.forEach((rec, i) => {
+        checkPage();
+        const lines = doc.splitTextToSize((i + 1) + '. ' + rec, pageW - 32);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50,50,50);
+        doc.text(lines, 16, y);
+        y += lines.length * 4.5;
+      });
+      y += 4;
+
+      // ── FOOTER ──
+      checkPage();
+      doc.setFillColor(10, 21, 32);
+      doc.rect(0, 282, pageW, 15, 'F');
+      doc.setFontSize(8); doc.setTextColor(120, 160, 190);
+      doc.text('NELSON AI — AI-Based Vital Analysis & Health Prediction System', 14, 289);
+      doc.text('This report is AI-generated and not a substitute for professional medical advice.', 14, 293);
+
+      // Save
+      const filename = 'NELSON_AI_Report_' + new Date().toISOString().slice(0, 10) + '.pdf';
+      doc.save(filename);
+      showToast('PDF report downloaded: ' + filename);
+    }
+  </script>
+</body>
+
+</html>

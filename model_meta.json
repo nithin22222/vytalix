@@ -1,0 +1,86 @@
+{
+  "accuracy": 99.78,
+  "classes": [
+    "Arrhythmia",
+    "Bradycardia",
+    "Diabetes Risk",
+    "Fever/Infection",
+    "Heart Failure Risk",
+    "Hypertension",
+    "Hypoxia",
+    "Normal",
+    "Tachycardia"
+  ],
+  "features": [
+    "age",
+    "gender",
+    "bmi",
+    "heart_rate",
+    "spo2",
+    "temperature",
+    "systolic_bp",
+    "diastolic_bp",
+    "pr_interval",
+    "qrs_duration",
+    "qt_interval",
+    "st_elevation",
+    "glucose",
+    "cholesterol",
+    "resp_rate"
+  ],
+  "training_samples": 80000,
+  "feature_importance": {
+    "diastolic_bp": 0.294,
+    "systolic_bp": 0.1931,
+    "glucose": 0.1235,
+    "age": 0.1175,
+    "heart_rate": 0.0867,
+    "pr_interval": 0.0748,
+    "bmi": 0.0484,
+    "qt_interval": 0.0368,
+    "spo2": 0.0134,
+    "qrs_duration": 0.0047,
+    "temperature": 0.003,
+    "cholesterol": 0.0016,
+    "st_elevation": 0.0016,
+    "resp_rate": 0.0009,
+    "gender": 0.0001
+  },
+  "normal_ranges": {
+    "heart_rate": {
+      "min": 60,
+      "max": 100,
+      "unit": "bpm"
+    },
+    "spo2": {
+      "min": 95,
+      "max": 100,
+      "unit": "%"
+    },
+    "temperature": {
+      "min": 97.0,
+      "max": 99.5,
+      "unit": "\u00b0F"
+    },
+    "systolic_bp": {
+      "min": 90,
+      "max": 120,
+      "unit": "mmHg"
+    },
+    "diastolic_bp": {
+      "min": 60,
+      "max": 80,
+      "unit": "mmHg"
+    },
+    "glucose": {
+      "min": 70,
+      "max": 100,
+      "unit": "mg/dL"
+    },
+    "resp_rate": {
+      "min": 12,
+      "max": 20,
+      "unit": "br/min"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+Name,Phone,Heart Rate,SpO2,Temperature,Prediction,Confidence,Time,Temp,Risk,VisitNumber,ConsultationNumber,HealthScore,HeartRate,SystolicBP,DiastolicBP,RespiratoryRate,BloodSugar,Cholesterol,ECG,Age
+Nithin,1234567890,,,,Normal,,2026-03-23 20:45:08.523785,,Low,1.0,1.0,100.0,,,,,,,,
+Nithin,1234567890,,,,Normal,,2026-03-23 20:52:48.575552,,Low,1.0,1.0,100.0,,,,,,,,
+nelson,9876543210,,,,Normal,,2026-03-23 21:06:25.299093,,Low,1.0,1.0,100.0,,,,,,,,
+nelson,9876543210,,,,Hypoxia,,2026-03-23 21:21:39.551120,,Medium,1.0,1.0,75.0,,,,,,,,
