@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NELSON — Authentication</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #020509;
+      --bg2: #060d14;
+      --bg3: #0a1520;
+      --card: #0d1e2e;
+      --card2: #112030;
+      --border: #1a3045;
+      --border2: #1f3a55;
+      --text: #e8f4ff;
+      --text2: #7ba8cc;
+      --text3: #4a7a9b;
+      --accent: #00d4ff;
+      --accent2: #0090cc;
+      --green: #00ff88;
+      --red: #ff3366;
+      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .auth-container {
+      position: relative;
+      z-index: 10;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.4), transparent);
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: var(--glow);
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .form-group input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      transition: all 0.2s;
+      outline: none;
+      width: 100%;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--glow);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+    }
+
+    .toggle-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .toggle-text a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toggle-text a:hover {
+      text-decoration: underline;
+    }
+
+    #error-message {
+      color: var(--red);
+      font-size: 13px;
+      margin-bottom: 15px;
+      text-align: center;
+      display: none;
+      background: rgba(255, 51, 102, 0.1);
+      border: 1px solid rgba(255, 51, 102, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="auth-container">
+    <div class="logo">
+      <div class="logo-icon">🥀</div>
+      <div class="logo-text">NELSON <span>AI</span></div>
+    </div>
+
+    <div id="error-message"></div>
+
+    <!-- Login Section -->
+    <div id="login-section" class="section active">
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required />
+        </div>
+        <button type="submit" class="btn-submit">Login</button>
+      </form>
+      <div class="toggle-text">
+        Don't have an account? <a onclick="toggleAuth('signup')">Sign up</a>
+      </div>
+    </div>
+
+    <!-- Signup Section -->
+    <div id="signup-section" class="section">
+      <form id="signup-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="signup-username" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" required />
+        </div>
+        <button type="submit" class="btn-submit">Create Account</button>
+      </form>
+      <div class="toggle-text">
+        Already have an account? <a onclick="toggleAuth('login')">Login here</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleAuth(mode) {
+      document.getElementById('error-message').style.display = 'none';
+      if (mode === 'signup') {
+        document.getElementById('login-section').classList.remove('active');
+        document.getElementById('signup-section').classList.add('active');
+      } else {
+        document.getElementById('signup-section').classList.remove('active');
+        document.getElementById('login-section').classList.add('active');
+      }
+    }
+
+    function showError(msg) {
+      const err = document.getElementById('error-message');
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('login-username').value;
+      const p = document.getElementById('login-password').value;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          localStorage.setItem('loggedInUser', u);
+          window.location.href = '/';
+        } else {
+          showError(data.message || 'Login failed');
+        }
+      } catch (err) {
+        showError('Network error');
+      }
+    });
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('signup-username').value;
+      const p = document.getElementById('signup-password').value;
+
+      try {
+        const res = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          localStorage.setItem('loggedInUser', u);
+          window.location.href = '/';
+        } else {
+          showError(data.message || 'Signup failed');
+        }
+      } catch (err) {
+        showError('Network error');
+      }
+    });
+  </script>
+</body>
+
+</html>

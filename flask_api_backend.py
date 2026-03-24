@@ -44,6 +44,18 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+    
+    conn = sqlite3.connect('auth_users.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 init_db()
 
@@ -235,6 +247,53 @@ def meta():
 def health():
     return jsonify({'status': 'ok', 'model': 'VitalAI v1.0', 'accuracy': META['accuracy']})
 
+@app.route('/login')
+def serve_login():
+    return send_file('auth.html')
+
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return jsonify({'status': 'error', 'message': 'Username and password required'}), 400
+    try:
+        conn = sqlite3.connect('auth_users.db')
+        c = conn.cursor()
+        c.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        if 'conn' in locals(): conn.close()
+        return jsonify({'status': 'error', 'message': 'Username already exists, please login'}), 400
+    except Exception as e:
+        if 'conn' in locals(): conn.close()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        if 'conn' in locals(): conn.close()
+    return jsonify({'status': 'success'})
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    try:
+        conn = sqlite3.connect('auth_users.db')
+        c = conn.cursor()
+        c.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
+        user = c.fetchone()
+    except Exception as e:
+        if 'conn' in locals(): conn.close()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        if 'conn' in locals(): conn.close()
+        
+    if user:
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'error', 'message': 'User unavailable, please sign up.'}), 401
+
 @app.route('/api/save_record', methods=['POST'])
 def save_record():
     data = request.json
@@ -304,7 +363,7 @@ def shutdown():
 
 if __name__ == '__main__':
     import webbrowser, threading
-    print(f"🚀 VitalAI API running | Model accuracy: {META['accuracy']}%")
-    print(f"🌐 Open dashboard at: http://127.0.0.1:5050")
+    print(f"[START] VitalAI API running | Model accuracy: {META['accuracy']}%")
+    print(f"[INFO] Open dashboard at: http://127.0.0.1:5050")
     threading.Timer(1.5, lambda: webbrowser.open('http://127.0.0.1:5050')).start()
     app.run(debug=False, port=5050, use_reloader=False)

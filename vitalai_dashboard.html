@@ -5,6 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NELSON — AI-Based Vital Analysis & Health Prediction System</title>
+  <script>
+    if (!localStorage.getItem('loggedInUser')) {
+      window.location.href = '/login';
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -1095,6 +1100,10 @@
         <div class="live-dot"></div>
         ML Active
       </div>
+      <button onclick="logoutUser()" title="Logout User"
+        style="margin-left:8px; display:flex; align-items:center; gap:6px; background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.4); color:var(--accent); padding:4px 12px; border-radius:20px; cursor:pointer; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">
+        <span style="font-size:12px;">🚪</span> Logout
+      </button>
       <button onclick="shutdownServer()" title="Shutdown App"
         style="margin-left:8px; display:flex; align-items:center; gap:6px; background:rgba(255,51,102,0.1); border:1px solid rgba(255,51,102,0.4); color:var(--red); padding:4px 12px; border-radius:20px; cursor:pointer; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">
         <span style="font-size:12px;">⏻</span> Quit
@@ -1723,7 +1732,8 @@
         <div style="font-size: 50px; margin-bottom: 10px;">🩺</div>
         <h1 style="color:var(--text2); margin-bottom: 15px;">NELSON AI</h1>
         <p style="color:var(--text3); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.6;">
-          An advanced Health Dashboard and ICU Monitor. This application works by merging Machine Learning, LLMs, and Interactive Web Technologies to provide real-time clinical analysis.
+          An advanced Health Dashboard and ICU Monitor. This application works by merging Machine Learning, LLMs, and
+          Interactive Web Technologies to provide real-time clinical analysis.
         </p>
       </div>
 
@@ -1733,13 +1743,18 @@
             <div class="card-title">🧠 Machine Learning Core</div>
           </div>
           <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
-            <p style="margin-bottom: 10px; color: var(--text3);">The backend relies on an ensemble ML model architecture specifically tuned for processing raw vital signs.</p>
+            <p style="margin-bottom: 10px; color: var(--text3);">The backend relies on an ensemble ML model architecture
+              specifically tuned for processing raw vital signs.</p>
             <ul style="padding-left: 20px;">
-              <li><strong style="color:var(--accent);">Random Forest Classifier:</strong> 60 estimators handling feature weighting.</li>
-              <li><strong style="color:var(--yellow);">Gradient Boosting Modeler:</strong> Fine-tuned to detect complex conditional edge-cases like Arrhythmia combinations.</li>
-              <li><strong style="color:var(--green);">Soft Voting Algorithm:</strong> Combines the probability matrices directly inside Python's Scikit-Learn logic.</li>
+              <li><strong style="color:var(--accent);">Random Forest Classifier:</strong> 60 estimators handling feature
+                weighting.</li>
+              <li><strong style="color:var(--yellow);">Gradient Boosting Modeler:</strong> Fine-tuned to detect complex
+                conditional edge-cases like Arrhythmia combinations.</li>
+              <li><strong style="color:var(--green);">Soft Voting Algorithm:</strong> Combines the probability matrices
+                directly inside Python's Scikit-Learn logic.</li>
             </ul>
-            <p style="margin-top: 10px;">The model was originally trained on <b>100,000 synthetic patient records</b> utilizing 15 distinct vital features.</p>
+            <p style="margin-top: 10px;">The model was originally trained on <b>100,000 synthetic patient records</b>
+              utilizing 15 distinct vital features.</p>
           </div>
         </div>
 
@@ -1749,10 +1764,14 @@
           </div>
           <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
             <ul style="padding-left: 20px;">
-              <li><strong style="color:var(--accent);">Frontend UI:</strong> Plain HTML/CSS/JS with zero external frameworks. Beautiful glassmorphic UI, Chart.js for data visualization, and dynamic SVGs.</li>
-              <li><strong style="color:var(--pulse);">Flask API Backend:</strong> Local Python Flask server acting as the communication bridge.</li>
-              <li><strong style="color:var(--yellow);">Data Persistence:</strong> SQLite3 database (`patient_records.db`) saving historical patient runs for Admin auditing.</li>
-              <li><strong style="color:var(--green);">API Integration:</strong> Leverages Anthropic's Claude API for natural language clinical interpretations of the ML predictions.</li>
+              <li><strong style="color:var(--accent);">Frontend UI:</strong> Plain HTML/CSS/JS with zero external
+                frameworks. Beautiful glassmorphic UI, Chart.js for data visualization, and dynamic SVGs.</li>
+              <li><strong style="color:var(--pulse);">Flask API Backend:</strong> Local Python Flask server acting as
+                the communication bridge.</li>
+              <li><strong style="color:var(--yellow);">Data Persistence:</strong> SQLite3 database
+                (`patient_records.db`) saving historical patient runs for Admin auditing.</li>
+              <li><strong style="color:var(--green);">API Integration:</strong> Leverages Anthropic's Claude API for
+                natural language clinical interpretations of the ML predictions.</li>
             </ul>
           </div>
         </div>
@@ -1763,25 +1782,35 @@
           </div>
           <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
             <ul style="padding-left: 20px;">
-              <li><strong>Interactive Body Map:</strong> A 3D/SVG simulated human body automatically highlights stressed organs (e.g., Lungs for Hypoxia, Heart for Tachycardia) dynamically based on AI predictions.</li>
-              <li><strong>Live ICU Stream:</strong> Simulates real-time telemetry sensor drift. Constantly polls changing vitals directly into the AI for live ICU monitoring alerts.</li>
-              <li><strong>Animated ECG:</strong> Built from scratch using Javascript RequestAnimationFrame, calculating custom heartbeat waveforms mathematically tied to patient inputs.</li>
-              <li><strong>Admin Mode:</strong> PIN-protected layer revealing Model Insights and Patient History ledgers.</li>
-              <li><strong>Voice Dictation:</strong> Uses browser SpeechRecognition API to parse spoken vitals into input fields.</li>
+              <li><strong>Interactive Body Map:</strong> A 3D/SVG simulated human body automatically highlights stressed
+                organs (e.g., Lungs for Hypoxia, Heart for Tachycardia) dynamically based on AI predictions.</li>
+              <li><strong>Live ICU Stream:</strong> Simulates real-time telemetry sensor drift. Constantly polls
+                changing vitals directly into the AI for live ICU monitoring alerts.</li>
+              <li><strong>Animated ECG:</strong> Built from scratch using Javascript RequestAnimationFrame, calculating
+                custom heartbeat waveforms mathematically tied to patient inputs.</li>
+              <li><strong>Admin Mode:</strong> PIN-protected layer revealing Model Insights and Patient History ledgers.
+              </li>
+              <li><strong>Voice Dictation:</strong> Uses browser SpeechRecognition API to parse spoken vitals into input
+                fields.</li>
             </ul>
           </div>
         </div>
-        
+
         <div class="card">
           <div class="card-header">
             <div class="card-title">🚀 How it is Made & Deployed</div>
           </div>
           <div style="font-size: 14px; color: var(--text); line-height: 1.8;">
-            <p style="margin-bottom:10px; color: var(--text3);">Designed entirely as a portable, standalone application suite.</p>
+            <p style="margin-bottom:10px; color: var(--text3);">Designed entirely as a portable, standalone application
+              suite.</p>
             <ul style="padding-left: 20px;">
-              <li><strong style="color:var(--accent);">Silent Launcher:</strong> A VBScript (`Launch_Dashboard.vbs`) starts the Flask Server completely invisibly in the background.</li>
-              <li><strong style="color:var(--yellow);">Browser Auto-Boot:</strong> The script dynamically opens `vitalai_dashboard.html` directly in the user's web browser.</li>
-              <li><strong style="color:var(--green);">Internal Kill Switch:</strong> The UI's "Quit" button sends a `/api/shutdown` POST request straight to Flask which immediately gracefully shuts down the Python OS Process.</li>
+              <li><strong style="color:var(--accent);">Silent Launcher:</strong> A VBScript (`Launch_Dashboard.vbs`)
+                starts the Flask Server completely invisibly in the background.</li>
+              <li><strong style="color:var(--yellow);">Browser Auto-Boot:</strong> The script dynamically opens
+                `vitalai_dashboard.html` directly in the user's web browser.</li>
+              <li><strong style="color:var(--green);">Internal Kill Switch:</strong> The UI's "Quit" button sends a
+                `/api/shutdown` POST request straight to Flask which immediately gracefully shuts down the Python OS
+                Process.</li>
             </ul>
           </div>
         </div>
@@ -2071,7 +2100,7 @@
               risk_score: riskScore
             })
           });
-        } catch(e) { console.error('DB save failed', e); }
+        } catch (e) { console.error('DB save failed', e); }
 
         // Store in history locally as fallback
         historyData.push({
@@ -3198,8 +3227,13 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
     }
 
     // ═══════════════════════════════════════════════
-    //  SYSTEM SHUTDOWN
+    //  SYSTEM SHUTDOWN & LOGOUT
     // ═══════════════════════════════════════════════
+    function logoutUser() {
+      localStorage.removeItem('loggedInUser');
+      window.location.href = '/login';
+    }
+
     function shutdownServer() {
       if (confirm('Are you sure you want to stop the local server and quit NELSON AI?')) {
         fetch('/api/shutdown', { method: 'POST' }).catch(() => { });
