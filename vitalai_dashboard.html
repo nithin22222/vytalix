@@ -1120,10 +1120,8 @@
       <button class="tab" onclick="switchTab('analysis')">🔬 Analysis</button>
       <button class="tab" onclick="switchTab('ecg')">💓 ECG Monitor</button>
       <button class="tab" onclick="switchTab('about')">ℹ️ About NELSON</button>
-      <button class="tab admin-only" id="tab-btn-history" onclick="switchTab('history')" style="display:none;">📋
-        Patient History</button>
-      <button class="tab admin-only" id="tab-btn-model" onclick="switchTab('model')" style="display:none;">🧠 Model
-        Insights</button>
+      <button class="tab admin-only" id="tab-btn-history" onclick="switchTab('history')" style="display:none;">📋 Patient History</button>
+      <button class="tab admin-only" id="tab-btn-model" onclick="switchTab('model')" style="display:none;">🧠 Model Insights</button>
     </div>
 
     <!-- ═══════════════════════ TAB: DASHBOARD ═══════════════════════ -->
@@ -1132,7 +1130,7 @@
 
         <!-- LEFT: INPUT FORM -->
         <div>
-          <div class="card">
+          <div class="card" id="clinical-form">
             <div class="card-header">
               <div class="card-title">Patient Vitals Input</div>
               <div style="display:flex;gap:6px;">
@@ -1146,8 +1144,8 @@
             <div class="form-section-title">Patient Info</div>
             <div class="form-grid">
               <div class="form-group" style="grid-column: span 2;">
-                <label>Patient Name</label>
-                <input type="text" id="patient_name" value="" placeholder="Enter patient full name"
+                <label>Patient ID / Name</label>
+                <input type="text" id="patient_name" value="" placeholder="Enter Patient ID"
                   style="font-family:'Space Grotesk',sans-serif;">
               </div>
             </div>
@@ -1244,6 +1242,116 @@
                 📡
               </button>
             </div>
+          </div>
+
+          <div class="card" id="layman-form" style="display:none; margin-top:20px;">
+            <div class="card-header">
+              <div class="card-title">Layman Health Check</div>
+            </div>
+            <div class="form-section-title">Demographics & Basics</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Your Name</label>
+                <input type="text" id="layman_name" value="" placeholder="Enter your name" style="font-family:'Space Grotesk',sans-serif;">
+              </div>
+              <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="layman_age" value="45" min="1" max="120">
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select id="layman_gender">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="layman_weight" value="70" min="20" max="300">
+              </div>
+              <div class="form-group">
+                <label>Height (cm)</label>
+                <input type="number" id="layman_height" value="170" min="50" max="300">
+              </div>
+            </div>
+            <div class="form-section-title">Symptoms Questionnaire</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>How are you feeling overall?</label>
+                <select id="layman_feeling">
+                  <option value="1">Good, no complaints</option>
+                  <option value="2">Just okay, under the weather</option>
+                  <option value="3">Not great, feeling unwell</option>
+                  <option value="4">Terrible, very sick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Shortness of breath</label>
+                <select id="layman_breath">
+                  <option value="1">None</option>
+                  <option value="2">Mild / Occasional</option>
+                  <option value="3">Severe / Frequent</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Dizziness / Fainting</label>
+                <select id="layman_dizzy">
+                  <option value="1">None</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe / Fainted</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nausea / Vomiting</label>
+                <select id="layman_nausea">
+                  <option value="1">None</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Chest Pain / Pressure</label>
+                <select id="layman_chest">
+                  <option value="1">None</option>
+                  <option value="2">Mild Discomfort</option>
+                  <option value="3">Severe Pain</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fever / Chills</label>
+                <select id="layman_fever">
+                  <option value="1">No</option>
+                  <option value="2">Mild Fever</option>
+                  <option value="3">High Fever</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fast Heartbeat / Palpitations</label>
+                <select id="layman_palpitations">
+                  <option value="1">No</option>
+                  <option value="2">Occasionally</option>
+                  <option value="3">Frequently</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Excessive Thirst / Urination</label>
+                <select id="layman_thirst">
+                  <option value="1">No</option>
+                  <option value="2">Yes</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Fatigue / Weakness</label>
+                <select id="layman_fatigue">
+                  <option value="1">No</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-predict" onclick="runLaymanAnalysis()" style="margin-top: 20px; width: 100%;">
+              ⚡ Generate Easy Health Report
+            </button>
           </div>
         </div>
 
@@ -1614,7 +1722,7 @@
         <table class="history-table" id="history-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Patient ID</th>
               <th>Timestamp</th>
               <th>HR (bpm)</th>
               <th>SpO₂ (%)</th>
@@ -1837,8 +1945,8 @@
         "age": 0.0006, "resp_rate": 0.0006, "gender": 0.0001
       },
       training_dist: {
-        "Normal": 31638, "Hypertension": 12375, "Diabetes Risk": 2344, "Bradycardia": 1523,
-        "Arrhythmia": 1225, "Fever/Infection": 596, "Hypoxia": 196, "Tachycardia": 103
+        "Normal": 63276, "Hypertension": 24750, "Diabetes Risk": 4688, "Bradycardia": 3046,
+        "Arrhythmia": 2450, "Fever/Infection": 1192, "Hypoxia": 392, "Tachycardia": 206
       }
     };
 
@@ -2653,10 +2761,6 @@
     }
 
     function loadHistoryToDashboard(idx) {
-      if (!adminMode) {
-        showToast('Requires Admin Mode.');
-        return;
-      }
       if (!historyData || !historyData[idx]) return;
       const record = historyData[idx];
       if (!record.raw) {
@@ -2892,7 +2996,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       addLine('PATIENT DEMOGRAPHICS', 14, 13, 'bold', [0, 100, 160]);
       y += 2;
       const demoData = [
-        ['Patient Name', patientName],
+        ['Patient ID', patientName],
         ['Age', v.age + ' years'],
         ['Gender', v.gender === 1 ? 'Male' : 'Female'],
         ['BMI', v.bmi + ' kg/m²'],
@@ -3010,6 +3114,41 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
         y += lines.length * 4.5;
       });
       y += 4;
+      addSep();
+      checkPage();
+
+      // ── PATIENT HISTORY ──
+      const pHistory = (window.historyData || []).filter(h => h.name === patientName && patientName !== 'N/A' && patientName !== '');
+      if (pHistory.length > 0) {
+        addLine('PATIENT HISTORY (Past Visits)', 14, 13, 'bold', [0, 100, 160]);
+        y += 2;
+        
+        doc.setFillColor(235, 245, 255);
+        doc.rect(14, y - 3, pageW - 28, 7, 'F');
+        doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(60, 60, 60);
+        doc.text('Date/Time', 16, y + 1);
+        doc.text('Diagnosis', 70, y + 1);
+        doc.text('HR', 115, y + 1);
+        doc.text('SpO2', 130, y + 1);
+        doc.text('BP', 145, y + 1);
+        doc.text('Risk', 170, y + 1);
+        y += 8;
+
+        pHistory.forEach((h, idx) => {
+          checkPage();
+          if (idx % 2 === 0) { doc.setFillColor(248, 250, 255); doc.rect(14, y - 3, pageW - 28, 6, 'F'); }
+          doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50);
+          const dateStr = h.raw ? new Date(h.raw.timestamp).toLocaleString() : h.time;
+          doc.text(dateStr, 16, y);
+          doc.text(h.prediction.toString(), 70, y);
+          doc.text(h.hr.toString(), 115, y);
+          doc.text(h.spo2.toString() + '%', 130, y);
+          doc.text(h.bp.toString(), 145, y);
+          doc.text(h.riskScore.toString(), 170, y);
+          y += 6;
+        });
+        y += 3;
+      }
 
       // ── FOOTER ──
       checkPage();
@@ -3191,40 +3330,175 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
     //  MODE TOGGLE (Admin / Patient)
     // ═══════════════════════════════════════════════
     let adminMode = false;
+    let laymanMode = false;
 
     function toggleMode() {
-      if (!adminMode) {
-        // Switch to Admin Mode
+      if (!adminMode && !laymanMode) {
+        laymanMode = true;
+        document.getElementById('mode-badge').innerHTML = '<div class="live-dot" style="background:#aa44ff;"></div>Layman Mode';
+        document.getElementById('mode-badge').style.color = '#aa44ff';
+        document.getElementById('mode-badge').style.borderColor = 'rgba(170,68,255,0.3)';
+        document.getElementById('mode-badge').style.background = 'rgba(170,68,255,0.1)';
+        document.getElementById('clinical-form').style.display = 'none';
+        document.getElementById('layman-form').style.display = 'block';
+        document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+        if (document.getElementById('tab-model')?.classList.contains('active') || document.getElementById('tab-history')?.classList.contains('active')) {
+          switchTab('dashboard');
+        }
+        showToast('Layman Mode activated. Answer simple questions.');
+      } else if (laymanMode && !adminMode) {
         const pass = prompt('Enter Admin PIN (Hint: 1234):');
         if (pass === '1234') {
           adminMode = true;
+          laymanMode = false;
           document.getElementById('mode-badge').innerHTML = '<div class="live-dot" style="background:var(--yellow);"></div>Admin Mode';
           document.getElementById('mode-badge').style.color = 'var(--yellow)';
           document.getElementById('mode-badge').style.borderColor = 'rgba(255,204,0,0.3)';
           document.getElementById('mode-badge').style.background = 'rgba(255,204,0,0.1)';
+          document.getElementById('clinical-form').style.display = 'block';
+          document.getElementById('layman-form').style.display = 'none';
           document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
-          updateHistoryTable(); // Fetch from DB immediately
+          updateHistoryTable();
           showToast('Admin Mode unlocked. DB Synced.');
         } else if (pass !== null) {
           showToast('Incorrect PIN.');
         }
       } else {
-        // Switch to Patient Mode
         adminMode = false;
+        laymanMode = false;
         document.getElementById('mode-badge').innerHTML = '<div class="live-dot" style="background:var(--accent);"></div>Patient Mode';
         document.getElementById('mode-badge').style.color = 'var(--accent)';
         document.getElementById('mode-badge').style.borderColor = 'rgba(0,212,255,0.2)';
         document.getElementById('mode-badge').style.background = 'rgba(0,212,255,0.08)';
+        document.getElementById('clinical-form').style.display = 'block';
+        document.getElementById('layman-form').style.display = 'none';
         document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
-
-        // Switch back to dashboard if they are on a hidden tab
-        if (document.getElementById('tab-history')?.classList.contains('active') ||
-          document.getElementById('tab-model')?.classList.contains('active')) {
+        if (document.getElementById('tab-model')?.classList.contains('active') || document.getElementById('tab-history')?.classList.contains('active')) {
           switchTab('dashboard');
         }
         showToast('Switched to Patient Mode.');
       }
     }
+
+    function runLaymanAnalysis() {
+      // Basic info mapping
+      document.getElementById('patient_name').value = document.getElementById('layman_name').value || 'Layman User';
+      document.getElementById('age').value = document.getElementById('layman_age').value || 45;
+      document.getElementById('gender').value = document.getElementById('layman_gender').value || 1;
+      
+      let weight = +document.getElementById('layman_weight').value || 70;
+      let height = +document.getElementById('layman_height').value || 170;
+      let height_m = height / 100;
+      let bmi = weight / (height_m * height_m);
+      document.getElementById('bmi').value = bmi.toFixed(1);
+
+      // Symptoms
+      const feeling = +document.getElementById('layman_feeling').value;
+      const breath = +document.getElementById('layman_breath').value;
+      const dizzy = +document.getElementById('layman_dizzy').value;
+      const nausea = +document.getElementById('layman_nausea').value;
+      const chest = +document.getElementById('layman_chest').value;
+      const fever = +document.getElementById('layman_fever').value;
+      const palpitations = +document.getElementById('layman_palpitations').value;
+      const thirst = +document.getElementById('layman_thirst').value;
+      const fatigue = +document.getElementById('layman_fatigue').value;
+
+      let hr = 72 + (feeling - 1) * 3;
+      let spo2 = 98;
+      let sys = 118;
+      let temp = 98.6;
+      let pr = 158;
+      let glucose = 92;
+      let resp_rate = 16;
+      let cholesterol = 180;
+      let qrs = 88;
+      let qt = 398;
+      let st = 0.0;
+      
+      const calcAge = +document.getElementById('layman_age').value || 45;
+
+      // Adjust mapped vitals based on specific symptoms
+      if (breath === 2) { spo2 -= 4; hr += 10; resp_rate += 4; }
+      if (breath === 3) { spo2 -= 9; hr += 20; resp_rate += 10; sys += 10; }
+      
+      if (dizzy === 2) { sys -= 15; hr -= 10; pr += 10; }
+      if (dizzy === 3) { sys -= 35; hr -= 25; pr += 30; } // Bradycardia
+      
+      if (nausea === 2) { glucose += 20; }
+      if (nausea === 3) { glucose += 50; }
+      
+      if (chest === 2) { hr += 15; sys += 20; pr += 20; }
+      if (chest === 3) { hr += 30; sys += 40; pr += 50; qrs += 20; st += 1.5; }
+      
+      if (fever === 2) { temp = 100.5; hr += 10; }
+      if (fever === 3) { temp = 102.5; hr += 20; resp_rate += 4; }
+      
+      if (palpitations === 2) { hr += 15; }
+      if (palpitations === 3) { hr += 35; pr += 60; qt += 110; st += 2.0; } // Tachycardia/Arrhythmia
+      
+      if (thirst === 2) { glucose += 60; } // Diabetes Risk
+
+      if (fatigue === 2) { hr -= 5; }
+      if (fatigue === 3) { hr -= 15; sys -= 10; }
+
+      // Also incorporate Age/BMI risks into background numbers
+      if (bmi > 28) { sys += 15; cholesterol += 40; glucose += 15; }
+      if (calcAge > 60) { sys += 10; pr += 15; qt += 20; }
+
+      document.getElementById('heart_rate').value = hr;
+      document.getElementById('spo2').value = spo2;
+      document.getElementById('systolic_bp').value = Math.max(80, sys);
+      document.getElementById('diastolic_bp').value = Math.max(50, sys - 42);
+      document.getElementById('temperature').value = temp;
+      document.getElementById('pr_interval').value = pr;
+      document.getElementById('qrs_duration').value = qrs;
+      document.getElementById('qt_interval').value = qt;
+      document.getElementById('st_elevation').value = st;
+      document.getElementById('glucose').value = glucose;
+      document.getElementById('cholesterol').value = cholesterol;
+      document.getElementById('resp_rate').value = resp_rate;
+
+      updateLiveMetrics();
+      runPrediction();
+    }
+
+    // ═══════════════════════════════════════════════
+    //  PERSIST FORM VALUES IN LOCALSTORAGE
+    // ═══════════════════════════════════════════════
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputsToSave = [
+        // Clinical form
+        'patient_name', 'age', 'gender', 'bmi', 'resp_rate', 'heart_rate',
+        'spo2', 'temperature', 'systolic_bp', 'diastolic_bp', 'glucose',
+        'pr_interval', 'qrs_duration', 'qt_interval', 'st_elevation', 'cholesterol',
+        // Layman form
+        'layman_name', 'layman_age', 'layman_gender', 'layman_weight', 'layman_height',
+        'layman_feeling', 'layman_breath', 'layman_dizzy', 'layman_nausea',
+        'layman_chest', 'layman_fever', 'layman_palpitations', 'layman_thirst', 'layman_fatigue'
+      ];
+
+      // Load saved values
+      inputsToSave.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const saved = localStorage.getItem('nelson_input_' + id);
+          if (saved !== null) {
+            el.value = saved;
+          }
+          // Add listener to save on change
+          el.addEventListener('input', () => {
+             localStorage.setItem('nelson_input_' + id, el.value);
+          });
+          el.addEventListener('change', () => {
+             localStorage.setItem('nelson_input_' + id, el.value);
+          });
+        }
+      });
+      // Refresh UI based on the loaded values
+      if (typeof updateLiveMetrics === 'function') {
+        updateLiveMetrics();
+      }
+    });
 
     // ═══════════════════════════════════════════════
     //  SYSTEM SHUTDOWN & LOGOUT
