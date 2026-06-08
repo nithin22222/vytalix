@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 5050
 
 # Run the Flask API
-CMD ["python", "flask_api_backend.py"]
+CMD ["python", "api/flask_api_backend.py"]
