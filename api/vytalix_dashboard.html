@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NELSON — AI-Based Vital Analysis & Health Prediction System</title>
+  <title>VYTALIX — AI-Based Vital Analysis & Health Prediction System</title>
   <script>
     if (!localStorage.getItem('loggedInUser')) {
       window.location.href = '/login';
@@ -1065,7 +1065,7 @@
     <div class="logo">
       <div class="logo-icon">🥀</div>
       <div>
-        <div class="logo-text">NELSON <span>AI</span></div>
+        <div class="logo-text">VYTALIX <span>AI</span></div>
         <div style="font-size:10px;color:var(--text3);letter-spacing:1px;">AI-Based Vital Analysis</div>
       </div>
     </div>
@@ -1119,7 +1119,7 @@
       <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
       <button class="tab" onclick="switchTab('analysis')">🔬 Analysis</button>
       <button class="tab" onclick="switchTab('ecg')">💓 ECG Monitor</button>
-      <button class="tab" onclick="switchTab('about')">ℹ️ About NELSON</button>
+      <button class="tab" onclick="switchTab('about')">ℹ️ About VYTALIX</button>
       <button class="tab admin-only" id="tab-btn-history" onclick="switchTab('history')" style="display:none;">📋 Patient History</button>
       <button class="tab admin-only" id="tab-btn-model" onclick="switchTab('model')" style="display:none;">🧠 Model Insights</button>
     </div>
@@ -1603,14 +1603,14 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">AI Clinical Analysis</div>
-            <div class="card-badge">NELSON AI</div>
+            <div class="card-badge">VYTALIX AI</div>
           </div>
           <div style="margin-bottom:12px;">
             <button class="btn-secondary" onclick="runAIAnalysis()" id="ai-btn">🤖 Generate AI Report</button>
           </div>
           <div class="ai-response" id="ai-output">
             <span style="color:var(--text3);font-size:13px;">Click "Generate AI Report" after running the health
-              analysis to get a detailed clinical interpretation powered by Nelson AI.</span>
+              analysis to get a detailed clinical interpretation powered by Vytalix AI.</span>
           </div>
         </div>
         <div class="card">
@@ -1834,11 +1834,11 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════ TAB: ABOUT NELSON AI ═══════════════════════ -->
+    <!-- ═══════════════════════ TAB: ABOUT VYTALIX AI ═══════════════════════ -->
     <div id="tab-about" class="tab-content fade-in">
       <div class="card" style="margin-bottom: 20px; text-align: center; padding: 40px 20px;">
         <div style="font-size: 50px; margin-bottom: 10px;">🩺</div>
-        <h1 style="color:var(--text2); margin-bottom: 15px;">NELSON AI</h1>
+        <h1 style="color:var(--text2); margin-bottom: 15px;">VYTALIX AI</h1>
         <p style="color:var(--text3); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.6;">
           An advanced Health Dashboard and ICU Monitor. This application works by merging Machine Learning, LLMs, and
           Interactive Web Technologies to provide real-time clinical analysis.
@@ -1915,7 +1915,7 @@
               <li><strong style="color:var(--accent);">Silent Launcher:</strong> A VBScript (`Launch_Dashboard.vbs`)
                 starts the Flask Server completely invisibly in the background.</li>
               <li><strong style="color:var(--yellow);">Browser Auto-Boot:</strong> The script dynamically opens
-                `vitalai_dashboard.html` directly in the user's web browser.</li>
+                `vytalix_dashboard.html` directly in the user's web browser.</li>
               <li><strong style="color:var(--green);">Internal Kill Switch:</strong> The UI's "Quit" button sends a
                 `/api/shutdown` POST request straight to Flask which immediately gracefully shuts down the Python OS
                 Process.</li>
@@ -2797,7 +2797,7 @@
       const btn = document.getElementById('ai-btn');
       btn.disabled = true;
       const output = document.getElementById('ai-output');
-      output.innerHTML = `<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:4px;">Nelson AI is analyzing vitals...</span></div>`;
+      output.innerHTML = `<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:4px;">Vytalix AI is analyzing vitals...</span></div>`;
 
       const v = lastVitals;
       const prompt = `You are a clinical AI assistant. Analyze these patient vital signs and provide a concise, structured clinical interpretation.
@@ -2980,7 +2980,7 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 212, 255);
-      doc.text('NELSON AI', 14, 13);
+      doc.text('VYTALIX AI', 14, 13);
       doc.setFontSize(9);
       doc.setTextColor(180, 200, 220);
       doc.text('AI-Based Vital Analysis & Health Prediction Report', 14, 19);
@@ -3155,11 +3155,11 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       doc.setFillColor(10, 21, 32);
       doc.rect(0, 282, pageW, 15, 'F');
       doc.setFontSize(8); doc.setTextColor(120, 160, 190);
-      doc.text('NELSON AI — AI-Based Vital Analysis & Health Prediction System', 14, 289);
+      doc.text('VYTALIX AI — AI-Based Vital Analysis & Health Prediction System', 14, 289);
       doc.text('This report is AI-generated and not a substitute for professional medical advice.', 14, 293);
 
       // Save
-      const filename = 'NELSON_AI_Report_' + new Date().toISOString().slice(0, 10) + '.pdf';
+      const filename = 'VYTALIX_AI_Report_' + new Date().toISOString().slice(0, 10) + '.pdf';
       doc.save(filename);
       showToast('PDF report downloaded: ' + filename);
     }
@@ -3481,16 +3481,16 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
       inputsToSave.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-          const saved = localStorage.getItem('nelson_input_' + id);
+          const saved = localStorage.getItem('vytalix_input_' + id);
           if (saved !== null) {
             el.value = saved;
           }
           // Add listener to save on change
           el.addEventListener('input', () => {
-             localStorage.setItem('nelson_input_' + id, el.value);
+             localStorage.setItem('vytalix_input_' + id, el.value);
           });
           el.addEventListener('change', () => {
-             localStorage.setItem('nelson_input_' + id, el.value);
+             localStorage.setItem('vytalix_input_' + id, el.value);
           });
         }
       });
@@ -3509,12 +3509,12 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
     }
 
     function shutdownServer() {
-      if (confirm('Are you sure you want to stop the local server and quit NELSON AI?')) {
+      if (confirm('Are you sure you want to stop the local server and quit VYTALIX AI?')) {
         fetch('/api/shutdown', { method: 'POST' }).catch(() => { });
         document.body.innerHTML = `
           <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;">
             <div style="font-size:64px;margin-bottom:20px;filter:grayscale(1);opacity:0.5;">🩺</div>
-            <h1 style="color:var(--text2);margin-bottom:10px;font-weight:600;letter-spacing:-0.5px;">NELSON AI Disconnected</h1>
+            <h1 style="color:var(--text2);margin-bottom:10px;font-weight:600;letter-spacing:-0.5px;">VYTALIX AI Disconnected</h1>
             <p style="color:var(--text3);font-size:15px;max-width:400px;text-align:center;line-height:1.6;">
               The local backend server has been safely stopped.<br>
               You can now close this browser window.

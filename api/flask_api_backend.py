@@ -1,5 +1,5 @@
 """
-VitalAI - Flask REST API Backend
+Vytalix - Flask REST API Backend
 Serves ML predictions and health analytics
 """
 
@@ -35,7 +35,7 @@ PATIENT_CSV = os.path.join(DB_DIR, 'patient_records.csv')
 
 MODEL_PATH = os.path.join(BASE_DIR, 'vital_model.pkl')
 META_PATH = os.path.join(BASE_DIR, 'model_meta.json')
-DASHBOARD_PATH = os.path.join(BASE_DIR, 'vitalai_dashboard.html')
+DASHBOARD_PATH = os.path.join(BASE_DIR, 'vytalix_dashboard.html')
 AUTH_PATH = os.path.join(BASE_DIR, 'auth.html')
 
 def init_db():
@@ -265,7 +265,7 @@ def meta():
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'ok', 'model': 'VitalAI v1.0', 'accuracy': META['accuracy']})
+    return jsonify({'status': 'ok', 'model': 'Vytalix v1.0', 'accuracy': META['accuracy']})
 
 @app.route('/login')
 def serve_login():
@@ -383,7 +383,7 @@ def shutdown():
 
 if __name__ == '__main__':
     import webbrowser, threading
-    print(f"[START] VitalAI API running | Model accuracy: {META['accuracy']}%")
+    print(f"[START] Vytalix API running | Model accuracy: {META['accuracy']}%")
     print(f"[INFO] Open dashboard at: http://127.0.0.1:5050")
     threading.Timer(1.5, lambda: webbrowser.open('http://127.0.0.1:5050')).start()
     app.run(debug=False, port=5050, use_reloader=False)
