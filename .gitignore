@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 *.pkl
+!vital_model.pkl
 *.pyo
 .env
 .venv/
+

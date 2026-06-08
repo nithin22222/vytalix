@@ -18,8 +18,28 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Check if running in a serverless environment (Vercel, Netlify, etc.)
+IS_SERVERLESS = 'VERCEL' in os.environ or 'NETLIFY' in os.environ or 'AWS_LAMBDA_FUNCTION_NAME' in os.environ
+
+if IS_SERVERLESS:
+    # Serverless environments have a read-only filesystem except for /tmp
+    DB_DIR = '/tmp'
+else:
+    DB_DIR = BASE_DIR
+
+PATIENT_DB = os.path.join(DB_DIR, 'patient_records.db')
+AUTH_DB = os.path.join(DB_DIR, 'auth_users.db')
+PATIENT_CSV = os.path.join(DB_DIR, 'patient_records.csv')
+
+MODEL_PATH = os.path.join(BASE_DIR, 'vital_model.pkl')
+META_PATH = os.path.join(BASE_DIR, 'model_meta.json')
+DASHBOARD_PATH = os.path.join(BASE_DIR, 'vitalai_dashboard.html')
+AUTH_PATH = os.path.join(BASE_DIR, 'auth.html')
+
 def init_db():
-    conn = sqlite3.connect('patient_records.db')
+    conn = sqlite3.connect(PATIENT_DB)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS patient_records (
@@ -45,7 +65,7 @@ def init_db():
     conn.commit()
     conn.close()
     
-    conn = sqlite3.connect('auth_users.db')
+    conn = sqlite3.connect(AUTH_DB)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -60,7 +80,7 @@ def init_db():
 init_db()
 
 # Load model artifacts
-with open('vital_model.pkl', 'rb') as f:
+with open(MODEL_PATH, 'rb') as f:
     arts = pickle.load(f)
 
 rf = arts['ensemble']
@@ -69,7 +89,7 @@ le = arts['label_encoder']
 FEATURES = arts['features']
 CLASSES = arts['classes']
 
-with open('model_meta.json') as f:
+with open(META_PATH) as f:
     META = json.load(f)
 
 # Severity mapping
@@ -128,7 +148,7 @@ def get_abnormal_vitals(data):
 
 @app.route('/')
 def serve_dashboard():
-    return send_file('vitalai_dashboard.html')
+    return send_file(DASHBOARD_PATH)
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -249,7 +269,7 @@ def health():
 
 @app.route('/login')
 def serve_login():
-    return send_file('auth.html')
+    return send_file(AUTH_PATH)
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -259,7 +279,7 @@ def signup():
     if not username or not password:
         return jsonify({'status': 'error', 'message': 'Username and password required'}), 400
     try:
-        conn = sqlite3.connect('auth_users.db')
+        conn = sqlite3.connect(AUTH_DB)
         c = conn.cursor()
         c.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
         conn.commit()
@@ -279,7 +299,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     try:
-        conn = sqlite3.connect('auth_users.db')
+        conn = sqlite3.connect(AUTH_DB)
         c = conn.cursor()
         c.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
         user = c.fetchone()
@@ -298,7 +318,7 @@ def login():
 def save_record():
     data = request.json
     try:
-        conn = sqlite3.connect('patient_records.db')
+        conn = sqlite3.connect(PATIENT_DB)
         c = conn.cursor()
         c.execute('''
             INSERT INTO patient_records (
@@ -328,8 +348,8 @@ def save_record():
         conn.close()
         
         # Also keep CSV for legacy compatibility temporarily
-        file_exists = os.path.isfile('patient_records.csv')
-        with open('patient_records.csv', mode='a', newline='', encoding='utf-8') as f:
+        file_exists = os.path.isfile(PATIENT_CSV)
+        with open(PATIENT_CSV, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=data.keys())
             if not file_exists:
                 writer.writeheader()
@@ -342,7 +362,7 @@ def save_record():
 @app.route('/api/history', methods=['GET'])
 def get_history():
     try:
-        conn = sqlite3.connect('patient_records.db')
+        conn = sqlite3.connect(PATIENT_DB)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute('SELECT * FROM patient_records ORDER BY id ASC LIMIT 200')
