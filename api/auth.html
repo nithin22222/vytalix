@@ -1,222 +1,279 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vytalix AI - Secure Access</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        'vytalix-dark': '#0B0C10',
-                        'vytalix-panel': '#1F2833',
-                        'vytalix-cyan': '#66FCF1',
-                        'vytalix-teal': '#45A29E',
-                        'vytalix-light': '#C5C6C7',
-                    }
-                }
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vytalix | Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;600&amp;family=Geist:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Load Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#00dbe9",
+                    "on-tertiary-container": "#4140f5",
+                    "primary-fixed": "#7df4ff",
+                    "secondary-container": "#fe00fe",
+                    "on-secondary": "#5b005b",
+                    "surface-container": "#201f1f",
+                    "primary": "#dbfcff",
+                    "inverse-on-surface": "#313030",
+                    "tertiary": "#f8f4ff",
+                    "background": "#131313",
+                    "surface-container-high": "#2a2a2a",
+                    "tertiary-container": "#d7d6ff",
+                    "on-primary-container": "#006970",
+                    "surface-tint": "#00dbe9",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#e1e0ff",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#2316de",
+                    "inverse-primary": "#006970",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed-dim": "#ffabf3",
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface": "#131313",
+                    "on-surface": "#e5e2e1",
+                    "on-error-container": "#ffdad6",
+                    "primary-container": "#00f0ff",
+                    "outline": "#849495",
+                    "error": "#ffb4ab",
+                    "surface-bright": "#3a3939",
+                    "on-primary-fixed-variant": "#004f54",
+                    "outline-variant": "#3b494b",
+                    "on-tertiary": "#1100a9",
+                    "on-primary-fixed": "#002022",
+                    "on-secondary-fixed": "#380038",
+                    "on-background": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "on-secondary-container": "#500050",
+                    "secondary": "#ffabf3",
+                    "on-primary": "#00363a",
+                    "secondary-fixed": "#ffd7f5",
+                    "surface-variant": "#353534",
+                    "on-secondary-fixed-variant": "#810081",
+                    "on-tertiary-fixed": "#07006c",
+                    "on-surface-variant": "#b9cacb",
+                    "surface-container-highest": "#353534",
+                    "tertiary-fixed-dim": "#c0c1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "80px",
+                    "gutter": "32px",
+                    "section-gap": "160px",
+                    "margin-mobile": "24px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "display-2xl": ["Sora"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Sora"],
+                    "headline-lg-mobile": ["Sora"],
+                    "display-lg": ["Sora"],
+                    "label-caps": ["Geist"]
+            },
+            "fontSize": {
+                    "display-2xl": ["96px", {"lineHeight": "100%", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                    "body-md": ["18px", {"lineHeight": "160%", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "120%", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "120%", "fontWeight": "600"}],
+                    "display-lg": ["64px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "100%", "letterSpacing": "0.2em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes liquidFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .liquid-bg-animate {
+            background-size: 200% 200%;
+            animation: liquidFlow 15s ease infinite;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(24px);
+            background: rgba(28, 27, 27, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-    </script>
-    <style>
-        body { background-color: #0B0C10; color: #C5C6C7; }
-        .glass-panel {
-            background: rgba(31, 40, 51, 0.4);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(102, 252, 241, 0.1);
+
+        .vytalix-watermark {
+            user-select: none;
+            pointer-events: none;
         }
-        .mesh-bg {
-            background-color: #0B0C10;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(69, 162, 158, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(102, 252, 241, 0.1) 0px, transparent 50%);
+
+        input:focus {
+            box-shadow: 0 0 15px rgba(0, 219, 233, 0.3);
         }
-        .glow-text {
-            text-shadow: 0 0 20px rgba(102, 252, 241, 0.4);
-        }
-        .input-field {
-            background: rgba(11, 12, 16, 0.6);
-            border: 1px solid rgba(197, 198, 199, 0.2);
-            transition: all 0.3s ease;
-        }
-        .input-field:focus {
-            border-color: #66FCF1;
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
-            outline: none;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #45A29E 0%, #66FCF1 100%);
-            color: #0B0C10;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            box-shadow: 0 0 20px rgba(102, 252, 241, 0.4);
-            transform: translateY(-2px);
+
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(0, 219, 233, 0.5);
         }
     </style>
 </head>
-<body class="mesh-bg min-h-screen flex items-center justify-center p-4 lg:p-0">
-
-    <div class="w-full max-w-6xl h-auto lg:h-[800px] glass-panel rounded-3xl overflow-hidden flex flex-col lg:flex-row shadow-2xl">
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-hidden selection:bg-primary-fixed-dim/30">
+<main class="flex h-screen w-full relative">
+<!-- Left Side: Cinematic Visualization -->
+<section class="hidden lg:flex lg:w-3/5 relative overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Vytalix Visual" class="w-full h-full object-cover liquid-bg-animate brightness-75 scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvkACPfQK-TT7VJ79AnVsCwXbCL1s6CzGez6vM3UVi2AkMi7YW_KKJOqt1hdI5Oyngjzn9_eWabR6zL2i5FXptvhMQlwjzb7zdxydzGJjfKHhMdEo0V1aFhqQz1HEfFGk-XcogSBY0oG6-zuj6rLiAs-2VkZV_buQgA3hNaJ8LYiUtTqSR1bxrNScPPRSqWqC6Wi6xBlhDe0jd8HFBRwpqDUKhb5OvqVAx-QdjOYQqNn7-cwyankoFAmeW8ST6Gz3vqzLjJ5ShdZ8"/>
+</div>
+<!-- Overlay Gradient for Depth -->
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-background z-10"></div>
+<!-- Branding Overlay -->
+<div class="absolute bottom-margin-desktop left-margin-desktop z-20 fade-in-up" style="animation-delay: 0.2s;">
+<h1 class="font-display-lg text-display-lg text-white mb-4 tracking-tighter">Vytalix</h1>
+<p class="font-label-caps text-label-caps text-primary-fixed-dim opacity-80 uppercase">The biological operating system</p>
+</div>
+</section>
+<!-- Right Side: Login Panel -->
+<section class="w-full lg:w-2/5 flex items-center justify-center relative p-margin-mobile md:p-margin-desktop bg-background z-20">
+<!-- Background Giant Typography (Lumen Style) -->
+<div class="vytalix-watermark absolute inset-0 flex items-center justify-center z-0">
+<span class="font-display-2xl text-[20vw] lg:text-[12vw] font-black text-on-surface opacity-[0.02] tracking-widest">VYTALIX</span>
+</div>
+<!-- Login Card -->
+<div class="glass-panel w-full max-w-md p-10 rounded-xl relative z-10 fade-in-up" style="animation-delay: 0.4s;">
+<header class="mb-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Welcome back</h2>
+<p class="font-body-md text-on-surface-variant">to the future of you.</p>
+</header>
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<div class="group">
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2 transition-colors group-focus-within:text-primary-fixed-dim" for="email">ID ENTITY / EMAIL</label>
+<input class="w-full bg-surface-container-low border-0 border-b border-outline-variant py-4 px-0 text-on-surface focus:ring-0 focus:border-primary-fixed-dim transition-all duration-300 placeholder:text-outline-variant" id="email" placeholder="name@vytalix.bio" type="email"/>
+</div>
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant transition-colors group-focus-within:text-primary-fixed-dim" for="password">ACCESS KEY</label>
+<a class="font-label-caps text-[10px] text-primary-fixed-dim hover:text-primary-fixed transition-colors" href="#">FORGOT KEY?</a>
+</div>
+<input class="w-full bg-surface-container-low border-0 border-b border-outline-variant py-4 px-0 text-on-surface focus:ring-0 focus:border-primary-fixed-dim transition-all duration-300 placeholder:text-outline-variant" id="password" placeholder="••••••••••••" type="password"/>
+</div>
+<button class="btn-glow w-full bg-primary-fixed-dim text-on-primary py-5 rounded-lg font-body-md font-bold text-base transition-all duration-300 hover:bg-primary-fixed active:scale-95 flex items-center justify-center gap-3">
+                        Sync Environment
+                        <span class="material-symbols-outlined text-[20px]">bolt</span>
+</button>
+</form>
+<div class="mt-8 flex items-center gap-4">
+<div class="h-px bg-white/10 flex-grow"></div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">OR CONNECT VIA</span>
+<div class="h-px bg-white/10 flex-grow"></div>
+</div>
+<div class="mt-8">
+<button class="w-full flex items-center justify-center gap-4 py-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all group">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.248 1.248-3.2 2.592-6.512 2.592-5.248 0-9.456-4.24-9.456-9.456s4.208-9.456 9.456-9.456c2.848 0 5.088 1.112 6.616 2.56l2.312-2.312C18.552 1.912 15.9 0 12.48 0 6.912 0 2.304 4.504 2.304 10.08S6.912 20.16 12.48 20.16c3.088 0 5.432-1.016 7.28-2.96 1.88-1.88 2.48-4.52 2.48-6.656 0-.64-.048-1.264-.144-1.84h-9.616z" fill="#EA4335"></path>
+</svg>
+<span class="font-body-md text-sm text-on-surface-variant group-hover:text-on-surface">Continue with Neural Google</span>
+</button>
+</div>
+<footer class="mt-12 text-center">
+<p class="font-body-md text-sm text-on-surface-variant">
+                        New explorer? 
+                        <a class="text-primary-fixed-dim font-bold hover:underline" href="#">Apply for Node Access</a>
+</p>
+</footer>
+</div>
+<!-- Bottom Legal Bar -->
+<div class="absolute bottom-8 left-0 right-0 px-margin-desktop flex justify-between items-center opacity-40">
+<p class="font-label-caps text-[10px]">© 2024 VYTALIX ECOSYSTEM</p>
+<div class="flex gap-6">
+<a class="font-label-caps text-[10px] hover:text-white transition-colors" href="#">LEGAL</a>
+<a class="font-label-caps text-[10px] hover:text-white transition-colors" href="#">SECURITY</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Interactive Cursor Dot (Atmospheric Effect) -->
+<div class="fixed top-0 left-0 w-96 h-96 bg-primary-fixed-dim/5 rounded-full blur-[100px] pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500 opacity-0 lg:block hidden" id="cursor-glow"></div>
+<script>
+        const cursorGlow = document.getElementById('cursor-glow');
         
-        <!-- Left Side: Branding -->
-        <div class="lg:w-1/2 p-12 flex flex-col justify-between relative overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-br from-vytalix-teal/20 to-vytalix-dark/80 z-0"></div>
-            <!-- Decorative circle -->
-            <div class="absolute -top-32 -left-32 w-96 h-96 bg-vytalix-cyan/10 rounded-full blur-3xl group-hover:bg-vytalix-cyan/20 transition-all duration-1000"></div>
-            
-            <div class="relative z-10">
-                <h1 class="text-5xl font-display font-bold text-white tracking-tight glow-text">VYTALIX <span class="text-vytalix-cyan">AI</span></h1>
-                <p class="mt-4 text-lg text-vytalix-light max-w-sm">Clinical Intelligence & Predictive Analytics Platform</p>
-            </div>
-
-            <div class="relative z-10 mt-12 lg:mt-0">
-                <div class="glass-panel p-6 rounded-2xl inline-block border-l-4 border-l-vytalix-cyan">
-                    <p class="text-sm font-semibold uppercase tracking-wider text-vytalix-cyan mb-2">System Status</p>
-                    <p class="text-white font-display text-xl">All nodes operational</p>
-                    <p class="text-xs text-vytalix-light mt-1">Ensemble Model Accuracy: 99.8%</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Side: Forms -->
-        <div class="lg:w-1/2 bg-vytalix-dark/60 p-12 lg:p-20 flex flex-col justify-center relative">
-            <div id="error-message" class="hidden mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/50 text-red-400 text-sm font-medium"></div>
-
-            <!-- Login Section -->
-            <div id="login-section" class="transition-all duration-500">
-                <h2 class="text-3xl font-display font-bold text-white mb-2">Welcome Back</h2>
-                <p class="text-vytalix-light mb-10">Authenticate to access the clinical vault.</p>
-
-                <form id="login-form" class="space-y-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-vytalix-light uppercase tracking-wider mb-2">Clinical ID / Username</label>
-                        <input type="text" id="login-username" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="Enter your ID">
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-xs font-semibold text-vytalix-light uppercase tracking-wider">Access Key</label>
-                            <a href="#" class="text-xs text-vytalix-cyan hover:underline">Forgot Key?</a>
-                        </div>
-                        <input type="password" id="login-password" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="btn-primary w-full py-4 rounded-xl font-bold tracking-wide text-lg mt-4">
-                        Initialize Session
-                    </button>
-                </form>
-
-                <p class="mt-8 text-center text-sm text-vytalix-light">
-                    New clinician? 
-                    <a href="#" onclick="toggleAuth('signup')" class="text-vytalix-cyan font-semibold hover:underline">Request Access</a>
-                </p>
-            </div>
-
-            <!-- Signup Section -->
-            <div id="signup-section" class="hidden transition-all duration-500">
-                <h2 class="text-3xl font-display font-bold text-white mb-2">Request Node Access</h2>
-                <p class="text-vytalix-light mb-10">Register your credentials for the ecosystem.</p>
-
-                <form id="signup-form" class="space-y-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-vytalix-light uppercase tracking-wider mb-2">Desired Clinical ID</label>
-                        <input type="text" id="signup-username" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="Choose an ID">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-vytalix-light uppercase tracking-wider mb-2">Secure Access Key</label>
-                        <input type="password" id="signup-password" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="Create a secure password">
-                    </div>
-                    <button type="submit" class="btn-primary w-full py-4 rounded-xl font-bold tracking-wide text-lg mt-4">
-                        Register Node
-                    </button>
-                </form>
-
-                <p class="mt-8 text-center text-sm text-vytalix-light">
-                    Already authorized? 
-                    <a href="#" onclick="toggleAuth('login')" class="text-vytalix-cyan font-semibold hover:underline">Return to Login</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function toggleAuth(mode) {
-            document.getElementById('error-message').classList.add('hidden');
-            if (mode === 'signup') {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('signup-section').classList.remove('hidden');
-            } else {
-                document.getElementById('signup-section').classList.add('hidden');
-                document.getElementById('login-section').classList.remove('hidden');
-            }
-        }
-
-        function showError(msg) {
-            const err = document.getElementById('error-message');
-            err.textContent = msg;
-            err.classList.remove('hidden');
-        }
-
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const u = document.getElementById('login-username').value;
-            const p = document.getElementById('login-password').value;
-            const btn = e.target.querySelector('button');
-            btn.innerHTML = 'Syncing...';
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: u, password: p })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    localStorage.setItem('loggedInUser', u);
-                    window.location.href = '/';
-                } else {
-                    showError(data.message || 'Login failed');
-                    btn.innerHTML = 'Initialize Session';
-                }
-            } catch (err) {
-                showError('Network error');
-                btn.innerHTML = 'Initialize Session';
-            }
+        window.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+            cursorGlow.style.opacity = '1';
         });
 
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const u = document.getElementById('signup-username').value;
-            const p = document.getElementById('signup-password').value;
-            const btn = e.target.querySelector('button');
-            btn.innerHTML = 'Registering...';
+        document.addEventListener('mouseleave', () => {
+            cursorGlow.style.opacity = '0';
+        });
 
-            try {
-                const res = await fetch('/api/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: u, password: p })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    localStorage.setItem('loggedInUser', u);
-                    window.location.href = '/';
-                } else {
-                    showError(data.message || 'Signup failed');
-                    btn.innerHTML = 'Register Node';
-                }
-            } catch (err) {
-                showError('Network error');
-                btn.innerHTML = 'Register Node';
-            }
+        // Simple magnetic effect for the main button
+        const btn = document.querySelector('.btn-glow');
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.02)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px) scale(1)`;
         });
     </script>
-</body>
-</html>
+</body></html><script>
+    document.querySelector('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const u = document.getElementById('email').value;
+        const p = document.getElementById('password').value;
+        if(!u || !p) { alert('Please enter email and password'); return; }
+        const btn = document.querySelector('.btn-glow');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = 'Syncing...';
+        
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                localStorage.setItem('loggedInUser', u);
+                window.location.href = '/';
+            } else {
+                alert(data.message || 'Login failed');
+                btn.innerHTML = oldText;
+            }
+        } catch (err) {
+            alert('Network error');
+            btn.innerHTML = oldText;
+        }
+    });
+</script>
