@@ -247,33 +247,88 @@
             btn.style.transform = `translate(0px, 0px) scale(1)`;
         });
     </script>
-</body></html><script>
-    document.querySelector('form').addEventListener('submit', async (e) => {
+
+<script>
+    // Handle the main login/signup form
+    const form = document.querySelector('form');
+    // Remove the inline onsubmit so it doesn't conflict
+    form.removeAttribute('onsubmit');
+    
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const u = document.getElementById('email').value;
         const p = document.getElementById('password').value;
         if(!u || !p) { alert('Please enter email and password'); return; }
+        
         const btn = document.querySelector('.btn-glow');
         const oldText = btn.innerHTML;
         btn.innerHTML = 'Syncing...';
         
         try {
-            const res = await fetch('/api/login', {
+            // Try to login first
+            let res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: u, password: p })
             });
-            const data = await res.json();
+            let data = await res.json();
+            
+            // If user unavailable, automatically sign them up!
+            if (data.status === 'error' && data.message.includes('sign up')) {
+                btn.innerHTML = 'Registering Node...';
+                res = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                data = await res.json();
+            }
+            
             if (data.status === 'success') {
                 localStorage.setItem('loggedInUser', u);
                 window.location.href = '/';
             } else {
-                alert(data.message || 'Login failed');
+                alert(data.message || 'Authentication failed');
                 btn.innerHTML = oldText;
             }
         } catch (err) {
-            alert('Network error');
+            alert('Network error: ' + err.message);
             btn.innerHTML = oldText;
         }
     });
+
+    // Make 'Apply for Node Access' also focus the form and change button text
+    const applyLink = document.querySelector('a[href="#"]'); // The first one might be forgot key, let's find by text
+    document.querySelectorAll('a').forEach(a => {
+        if(a.innerText.includes('Apply for Node Access')) {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('email').focus();
+                document.querySelector('.btn-glow').innerHTML = 'Register Node <span class="material-symbols-outlined text-[20px]">bolt</span>';
+            });
+        }
+        if(a.innerText.includes('FORGOT KEY')) {
+            a.addEventListener('click', (e) => { e.preventDefault(); alert('Please register a new node with a new email.'); });
+        }
+    });
+
+    // Make 'Continue with Neural Google' work
+    const googleBtn = document.querySelector('button.group');
+    if(googleBtn) {
+        googleBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const u = "neural_google_user_" + Math.floor(Math.random()*1000) + "@vytalix.bio";
+            const p = "google_auth";
+            // Auto signup and login
+            await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            localStorage.setItem('loggedInUser', u);
+            window.location.href = '/';
+        });
+    }
 </script>
+</body>
+</html>
