@@ -1,0 +1,285 @@
+<div class="tabs">
+      <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+      <button class="tab" onclick="switchTab('analysis')">🔬 Analysis</button>
+      <button class="tab" onclick="switchTab('ecg')">💓 ECG Monitor</button>
+      <button class="tab" onclick="switchTab('about')">ℹ️ About VYTALIX</button>
+      <button class="tab admin-only" id="tab-btn-history" onclick="switchTab('history')" style="display:none;">📋 Patient History</button>
+      <button class="tab admin-only" id="tab-btn-model" onclick="switchTab('model')" style="display:none;">🧠 Model Insights</button>
+    </div>
+
+    <!-- ═══════════════════════ TAB: DASHBOARD ═══════════════════════ -->
+    <div id="tab-dashboard" class="tab-content active fade-in">
+      <div class="grid-main">
+
+        <!-- LEFT: INPUT FORM -->
+        <div>
+          <div class="card" id="clinical-form">
+            <div class="card-header">
+              <div class="card-title">Patient Vitals Input</div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-secondary" onclick="loadSample('normal')">Normal</button>
+                <button class="btn-secondary" onclick="loadSample('hypertension')">HTN</button>
+                <button class="btn-secondary" onclick="loadSample('arrhythmia')">ECG</button>
+                <button class="btn-secondary" onclick="loadSample('critical')">Critical</button>
+              </div>
+            </div>
+
+            <div class="form-section-title">Patient Info</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Patient ID / Name</label>
+                <input type="text" id="patient_name" value="" placeholder="Enter Patient ID"
+                  style="font-family:'Space Grotesk',sans-serif;">
+              </div>
+            </div>
+
+            <div class="form-section-title">Demographics</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="age" value="45" min="1" max="120">
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select id="gender">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>BMI (kg/m²)</label>
+                <input type="number" id="bmi" value="24.5" step="0.1" min="10" max="60">
+              </div>
+              <div class="form-group">
+                <label>Resp Rate (br/min)</label>
+                <input type="number" id="resp_rate" value="16">
+              </div>
+            </div>
+
+            <div class="form-section-title">Core Vitals</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Heart Rate (bpm)</label>
+                <input type="number" id="heart_rate" value="72" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>SpO₂ (%)</label>
+                <input type="number" id="spo2" value="98" step="0.1" min="70" max="100" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Temperature (°F)</label>
+                <input type="number" id="temperature" value="98.6" step="0.1" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Systolic BP (mmHg)</label>
+                <input type="number" id="systolic_bp" value="118" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Diastolic BP (mmHg)</label>
+                <input type="number" id="diastolic_bp" value="76" oninput="updateLiveMetrics()">
+              </div>
+              <div class="form-group">
+                <label>Glucose (mg/dL)</label>
+                <input type="number" id="glucose" value="92" oninput="updateLiveMetrics()">
+              </div>
+            </div>
+
+            <div class="form-section-title">ECG Parameters</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>PR Interval (ms)</label>
+                <input type="number" id="pr_interval" value="158">
+              </div>
+              <div class="form-group">
+                <label>QRS Duration (ms)</label>
+                <input type="number" id="qrs_duration" value="88">
+              </div>
+              <div class="form-group">
+                <label>QT Interval (ms)</label>
+                <input type="number" id="qt_interval" value="398">
+              </div>
+              <div class="form-group">
+                <label>ST Elevation (mm)</label>
+                <input type="number" id="st_elevation" value="0.1" step="0.1">
+              </div>
+            </div>
+
+            <div class="form-section-title">Blood Panel</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Cholesterol (mg/dL)</label>
+                <input type="number" id="cholesterol" value="182">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button class="btn-predict" id="predict-btn" onclick="runPrediction()" style="margin-top: 0; flex: 1;">
+                ⚡ Run AI Health Analysis
+              </button>
+              <button class="btn-secondary" id="dictate-btn" onclick="startDictation()" title="Voice Dictation"
+                style="margin-top: 0; padding: 0 15px; font-size: 20px; border-radius: 12px; background: rgba(0,212,255,0.05); border-color: var(--accent2);">
+                🎙️
+              </button>
+              <button class="btn-secondary" id="live-btn" onclick="toggleLiveMonitor()" title="Live Monitor Stream"
+                style="margin-top: 0; padding: 0 15px; font-size: 20px; border-radius: 12px; background: rgba(0,255,136,0.05); border-color: rgba(0,255,136,0.4);">
+                📡
+              </button>
+            </div>
+          </div>
+
+          <div class="card" id="layman-form" style="display:none; margin-top:20px;">
+            <div class="card-header">
+              <div class="card-title">Layman Health Check</div>
+            </div>
+            <div class="form-section-title">Demographics & Basics</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Your Name</label>
+                <input type="text" id="layman_name" value="" placeholder="Enter your name" style="font-family:'Space Grotesk',sans-serif;">
+              </div>
+              <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="layman_age" value="45" min="1" max="120">
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select id="layman_gender">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="layman_weight" value="70" min="20" max="300">
+              </div>
+              <div class="form-group">
+                <label>Height (cm)</label>
+                <input type="number" id="layman_height" value="170" min="50" max="300">
+              </div>
+            </div>
+            <div class="form-section-title">Symptoms Questionnaire</div>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2;">
+                <label>How are you feeling overall?</label>
+                <select id="layman_feeling">
+                  <option value="1">Good, no complaints</option>
+                  <option value="2">Just okay, under the weather</option>
+                  <option value="3">Not great, feeling unwell</option>
+                  <option value="4">Terrible, very sick</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Shortness of breath</label>
+                <select id="layman_breath">
+                  <option value="1">None</option>
+                  <option value="2">Mild / Occasional</option>
+                  <option value="3">Severe / Frequent</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Dizziness / Fainting</label>
+                <select id="layman_dizzy">
+                  <option value="1">None</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe / Fainted</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nausea / Vomiting</label>
+                <select id="layman_nausea">
+                  <option value="1">None</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Chest Pain / Pressure</label>
+                <select id="layman_chest">
+                  <option value="1">None</option>
+                  <option value="2">Mild Discomfort</option>
+                  <option value="3">Severe Pain</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fever / Chills</label>
+                <select id="layman_fever">
+                  <option value="1">No</option>
+                  <option value="2">Mild Fever</option>
+                  <option value="3">High Fever</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fast Heartbeat / Palpitations</label>
+                <select id="layman_palpitations">
+                  <option value="1">No</option>
+                  <option value="2">Occasionally</option>
+                  <option value="3">Frequently</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Excessive Thirst / Urination</label>
+                <select id="layman_thirst">
+                  <option value="1">No</option>
+                  <option value="2">Yes</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Fatigue / Weakness</label>
+                <select id="layman_fatigue">
+                  <option value="1">No</option>
+                  <option value="2">Mild</option>
+                  <option value="3">Severe</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-predict" onclick="runLaymanAnalysis()" style="margin-top: 20px; width: 100%;">
+              ⚡ Generate Easy Health Report
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: RESULTS + METRICS -->
+        <div>
+
+          <!-- LIVE VITAL CARDS -->
+          <div class="vitals-summary-grid" id="vital-cards">
+            <div class="metric-card status-normal" id="card-hr">
+              <div class="metric-label">Heart Rate</div>
+              <div class="metric-value" id="disp-hr">72</div>
+              <div class="metric-unit">bpm</div>
+              <div class="metric-status status-badge-normal" id="badge-hr">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-hr" style="width:40%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-spo2">
+              <div class="metric-label">SpO₂</div>
+              <div class="metric-value" id="disp-spo2">98</div>
+              <div class="metric-unit">%</div>
+              <div class="metric-status status-badge-normal" id="badge-spo2">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-spo2" style="width:85%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-temp">
+              <div class="metric-label">Temperature</div>
+              <div class="metric-value" id="disp-temp">98.6</div>
+              <div class="metric-unit">°F</div>
+              <div class="metric-status status-badge-normal" id="badge-temp">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-temp" style="width:50%;background:var(--green)"></div>
+              </div>
+            </div>
+            <div class="metric-card status-normal" id="card-bp">
+              <div class="metric-label">Blood Pressure</div>
+              <div class="metric-value" id="disp-bp">118/76</div>
+              <div class="metric-unit">mmHg</div>
+              <div class="metric-status status-badge-normal" id="badge-bp">Normal</div>
+              <div class="metric-range">
+                <div class="metric-range-fill" id="fill-bp" style="width:45%;background:var(--green)"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULT PANEL -->
+          

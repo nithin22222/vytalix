@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vytalix Smart Report Vault</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;600&amp;family=Geist:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Sora:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#00dbe9",
+                        "on-tertiary-container": "#4140f5",
+                        "primary-fixed": "#7df4ff",
+                        "secondary-container": "#fe00fe",
+                        "on-secondary": "#5b005b",
+                        "surface-container": "#201f1f",
+                        "primary": "#dbfcff",
+                        "inverse-on-surface": "#313030",
+                        "tertiary": "#f8f4ff",
+                        "background": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#d7d6ff",
+                        "on-primary-container": "#006970",
+                        "surface-tint": "#00dbe9",
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#e1e0ff",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#2316de",
+                        "inverse-primary": "#006970",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed-dim": "#ffabf3",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#00f0ff",
+                        "outline": "#849495",
+                        "error": "#ffb4ab",
+                        "surface-bright": "#3a3939",
+                        "on-primary-fixed-variant": "#004f54",
+                        "outline-variant": "#3b494b",
+                        "on-tertiary": "#1100a9",
+                        "on-primary-fixed": "#002022",
+                        "on-secondary-fixed": "#380038",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "on-secondary-container": "#500050",
+                        "secondary": "#ffabf3",
+                        "on-primary": "#00363a",
+                        "secondary-fixed": "#ffd7f5",
+                        "surface-variant": "#353534",
+                        "on-secondary-fixed-variant": "#810081",
+                        "on-tertiary-fixed": "#07006c",
+                        "on-surface-variant": "#b9cacb",
+                        "surface-container-highest": "#353534",
+                        "tertiary-fixed-dim": "#c0c1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "gutter": "32px",
+                        "section-gap": "160px",
+                        "margin-mobile": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-2xl": ["Sora"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Sora"],
+                        "headline-lg-mobile": ["Sora"],
+                        "display-lg": ["Sora"],
+                        "label-caps": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display-2xl": ["96px", { "lineHeight": "100%", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "body-md": ["18px", { "lineHeight": "160%", "fontWeight": "400" }],
+                        "headline-lg": ["40px", { "lineHeight": "120%", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "120%", "fontWeight": "600" }],
+                        "display-lg": ["64px", { "lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "100%", "letterSpacing": "0.2em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .glass-card {
+            background: rgba(28, 27, 27, 0.4);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 219, 233, 0.4);
+            background: rgba(0, 219, 233, 0.03);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -20px rgba(0, 219, 233, 0.3);
+        }
+
+        .liquid-mesh {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 219, 233, 0.15), transparent 70%);
+            animation: pulse-mesh 12s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-mesh {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            50% { transform: scale(1.2) translate(5%, 2%); opacity: 0.6; }
+            100% { transform: scale(0.9) translate(-2%, 5%); opacity: 0.4; }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 219, 233, 0.5);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .upload-zone {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .upload-zone:hover {
+            border-color: #00dbe9;
+            background: rgba(0, 219, 233, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- AI Companion SideNav -->
+<aside class="fixed left-0 top-0 h-full w-80 bg-surface-container-low/90 backdrop-blur-lg border-r border-white/5 shadow-2xl flex flex-col p-6 space-y-8 z-50 hidden lg:flex">
+<div class="flex items-center space-x-4 mb-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed-dim">
+<img alt="Vya AI" class="w-full h-full object-cover" data-alt="A futuristic and ethereal portrait of a high-tech female AI companion with glowing fiber-optic hair strands in cyan and magenta. Her skin has a soft pearlescent texture, and her eyes are vibrant digital interfaces. The background is a deep, dark void with subtle floating data particles, matching a premium medical tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP5sQFKjXyk2b2SNOZAcW_9dh_uT1N8gWIx0gaOKRO24iQKezc7TSX_NCcmHkk3LRm9cL_Z4hM9_b_mSQmPnng2-M798k-eoNg3E6raZdLXllpGreEd54AVwI766yHFvWhWYn3BT0bvCih6ciXmi5wvyKGdKgDWPSgCsSeBimW-NaSzytC5mT0ra-8AY1BlWgP1cXCCb76w0R7GqGj9n1n6rzoHrH0F-htuXU1p8mbGP5j0ZeoUXFykKystO5f2Ov-SV0Eh74oxq8"/>
+</div>
+<div>
+<h3 class="font-display-lg text-[24px] font-bold text-on-surface leading-none">Vya AI</h3>
+<p class="font-label-caps text-[10px] text-primary-fixed-dim uppercase mt-1 tracking-widest">Health Companion</p>
+</div>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined mr-4">dashboard</span> Overview
+            </a>
+<a class="bg-primary-container text-on-primary-container rounded-xl flex items-center p-4 font-label-caps font-bold" href="#">
+<span class="material-symbols-outlined mr-4">monitor_heart</span> Vitals
+            </a>
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined mr-4">psychology</span> Neural Link
+            </a>
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined mr-4">settings</span> Settings
+            </a>
+</nav>
+<button class="w-full py-4 rounded-xl bg-primary-fixed-dim text-on-primary font-bold font-label-caps tracking-widest hover:shadow-[0_0_30px_rgba(0,219,233,0.4)] transition-all">
+            ANALYZE SYNC
+        </button>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:pl-80 min-h-screen relative overflow-hidden">
+<!-- Background Liquid Mesh -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="liquid-mesh absolute top-[-20%] right-[-10%] w-[80%] h-[80%] blur-[120px] rounded-full"></div>
+<div class="liquid-mesh absolute bottom-[-10%] left-[-5%] w-[60%] h-[60%] blur-[100px] rounded-full" style="background: radial-gradient(circle at 50% 50%, rgba(254, 0, 254, 0.1), transparent 70%); animation-delay: -3s;"></div>
+</div>
+<!-- Top Header Navigation (Mobile & Desktop Identity) -->
+<header class="fixed top-0 right-0 left-0 lg:left-80 z-40 bg-background/80 backdrop-blur-xl border-b border-white/10 px-6 lg:px-margin-desktop py-6 flex justify-between items-center">
+<div class="flex items-center space-x-3">
+<span class="font-display-lg text-[28px] font-bold tracking-tighter text-on-surface uppercase">Vytalix</span>
+</div>
+<nav class="hidden md:flex space-x-8">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps" href="#">Ecosystem</a>
+<a class="text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1 font-label-caps" href="#">Insights</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps" href="#">Solutions</a>
+</nav>
+<button class="bg-primary-fixed-dim/10 border border-primary-fixed-dim text-primary-fixed-dim px-6 py-2 rounded-full font-label-caps hover:bg-primary-fixed-dim hover:text-on-primary transition-all active:scale-95">
+                GET STARTED
+            </button>
+</header>
+<!-- Hero Section -->
+<section class="relative z-10 pt-40 pb-20 px-6 lg:px-margin-desktop">
+<div class="max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+<div class="max-w-2xl">
+<span class="font-label-caps text-primary-fixed-dim mb-4 block">SECURE REPOSITORY v2.4</span>
+<h1 class="font-display-2xl text-[80px] lg:text-display-2xl leading-[0.9] glow-text">VAULT</h1>
+<p class="font-body-md text-on-surface-variant mt-6 max-w-lg">
+                            Access your hyper-premium diagnostic history. Encrypted neural reports and biographic data synced via the Vytalix Ecosystem.
+                        </p>
+</div>
+<!-- Upload Component -->
+<div class="w-full md:w-80 h-48 upload-zone rounded-2xl flex flex-col items-center justify-center cursor-pointer group p-6 text-center">
+<span class="material-symbols-outlined text-4xl text-primary-fixed-dim mb-2 group-hover:scale-110 transition-transform">cloud_upload</span>
+<p class="font-label-caps text-on-surface-variant text-[10px]">DROP NEW DATA SYNC</p>
+<p class="text-[11px] text-outline mt-2">PDF, HL7, or DICOM</p>
+</div>
+</div>
+<!-- Filters -->
+<div class="flex space-x-4 mb-12 overflow-x-auto no-scrollbar pb-2">
+<button class="px-6 py-2 bg-primary-container text-on-primary-container rounded-full font-label-caps text-[11px] whitespace-nowrap">ALL RECORDS</button>
+<button class="px-6 py-2 border border-white/10 hover:border-primary-fixed-dim text-on-surface-variant hover:text-on-surface rounded-full font-label-caps text-[11px] whitespace-nowrap transition-all">GENOMIC</button>
+<button class="px-6 py-2 border border-white/10 hover:border-primary-fixed-dim text-on-surface-variant hover:text-on-surface rounded-full font-label-caps text-[11px] whitespace-nowrap transition-all">NEURAL</button>
+<button class="px-6 py-2 border border-white/10 hover:border-primary-fixed-dim text-on-surface-variant hover:text-on-surface rounded-full font-label-caps text-[11px] whitespace-nowrap transition-all">CARDIAC</button>
+</div>
+<!-- Report Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="glass-card p-8 rounded-[2rem] flex flex-col justify-between h-80 group">
+<div class="flex justify-between items-start">
+<div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden">
+<img alt="Heart Icon" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsd-bJJ26oNZq7e4yw8Qewr4JEd3XzhsZ8SbUAAfb1YumY-gUO2okkF2jIoYAglyOtuPuMYGe_KgQ3el8VdSdW5n1Hj820W5sGHhOtWo7j-gYwCZQSa4cx7gvBuTT4w1Nc9Eaj-NMn2dpCIDwEVCuXlI6Fo5gTuXumOceEqeU-lGN3BDGAVtdekieXNN-MZhS75gcmNSawPyrAc4AtP87SYmnsixF-Atm7gXVjrp4PK8smszhkooH-xeg"/>
+</div>
+<span class="font-label-caps text-[10px] text-primary-fixed-dim bg-primary-fixed-dim/10 px-3 py-1 rounded-full">CRITICAL SYNC</span>
+</div>
+<div>
+<h4 class="font-display-lg text-[24px] text-on-surface mb-2">Myocardial Flux Analysis</h4>
+<p class="text-on-surface-variant text-[14px]">Oct 14, 2024 • Biometric Lab A</p>
+</div>
+<div class="flex justify-between items-center pt-6 border-t border-white/5">
+<span class="font-label-caps text-[11px] text-outline">NEURAL ENCRYPTION: ON</span>
+<span class="material-symbols-outlined text-primary-fixed-dim opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card p-8 rounded-[2rem] flex flex-col justify-between h-80 group">
+<div class="flex justify-between items-start">
+<div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden">
+<img alt="DNA Icon" class="w-10 h-10 object-contain scale-[1.2]" src="https://lh3.googleusercontent.com/aida/AP1WRLsd-bJJ26oNZq7e4yw8Qewr4JEd3XzhsZ8SbUAAfb1YumY-gUO2okkF2jIoYAglyOtuPuMYGe_KgQ3el8VdSdW5n1Hj820W5sGHhOtWo7j-gYwCZQSa4cx7gvBuTT4w1Nc9Eaj-NMn2dpCIDwEVCuXlI6Fo5gTuXumOceEqeU-lGN3BDGAVtdekieXNN-MZhS75gcmNSawPyrAc4AtP87SYmnsixF-Atm7gXVjrp4PK8smszhkooH-xeg" style="filter: hue-rotate(180deg)"/>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant border border-white/10 px-3 py-1 rounded-full">ROUTINE</span>
+</div>
+<div>
+<h4 class="font-display-lg text-[24px] text-on-surface mb-2">Genomic Sequence v4</h4>
+<p class="text-on-surface-variant text-[14px]">Sep 28, 2024 • Helix Research</p>
+</div>
+<div class="flex justify-between items-center pt-6 border-t border-white/5">
+<span class="font-label-caps text-[11px] text-outline">NEURAL ENCRYPTION: ON</span>
+<span class="material-symbols-outlined text-primary-fixed-dim opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card p-8 rounded-[2rem] flex flex-col justify-between h-80 group">
+<div class="flex justify-between items-start">
+<div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden">
+<img alt="Folder Icon" class="w-10 h-10 object-contain scale-[1.1]" src="https://lh3.googleusercontent.com/aida/AP1WRLsd-bJJ26oNZq7e4yw8Qewr4JEd3XzhsZ8SbUAAfb1YumY-gUO2okkF2jIoYAglyOtuPuMYGe_KgQ3el8VdSdW5n1Hj820W5sGHhOtWo7j-gYwCZQSa4cx7gvBuTT4w1Nc9Eaj-NMn2dpCIDwEVCuXlI6Fo5gTuXumOceEqeU-lGN3BDGAVtdekieXNN-MZhS75gcmNSawPyrAc4AtP87SYmnsixF-Atm7gXVjrp4PK8smszhkooH-xeg" style="filter: hue-rotate(90deg)"/>
+</div>
+<span class="font-label-caps text-[10px] text-secondary-fixed-dim bg-secondary-fixed-dim/10 px-3 py-1 rounded-full">NEW UPLOAD</span>
+</div>
+<div>
+<h4 class="font-display-lg text-[24px] text-on-surface mb-2">Neural Link Integrity</h4>
+<p class="text-on-surface-variant text-[14px]">Oct 02, 2024 • Vya AI Core</p>
+</div>
+<div class="flex justify-between items-center pt-6 border-t border-white/5">
+<span class="font-label-caps text-[11px] text-outline">NEURAL ENCRYPTION: ON</span>
+<span class="material-symbols-outlined text-primary-fixed-dim opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+<!-- Card 4 (Asymmetric Large) -->
+<div class="lg:col-span-2 glass-card p-8 rounded-[2rem] flex flex-col md:flex-row gap-8 min-h-80 group">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-caps text-primary-fixed-dim block mb-4">LATEST INSIGHT</span>
+<h4 class="font-display-lg text-[32px] text-on-surface mb-4 leading-tight">Hyper-Premium Health Audit 2024</h4>
+<p class="text-on-surface-variant text-body-md">A comprehensive deep-dive into your physiological status, aggregated by Vya AI through all connected IoT nodes.</p>
+</div>
+<div class="flex space-x-4 mt-8">
+<button class="px-8 py-3 bg-on-surface text-background font-bold font-label-caps rounded-xl hover:scale-105 transition-transform">VIEW AUDIT</button>
+<button class="p-3 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-on-surface">share</span>
+</button>
+</div>
+</div>
+<div class="w-full md:w-1/3 h-full rounded-2xl overflow-hidden relative border border-white/5">
+<img alt="Medical visualization" class="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" data-alt="A futuristic medical scan visualization showing a human heart constructed of luminous blue and violet light particles. The background is a dark, minimalist digital space with faint surgical grid lines. The lighting is cold and clinical, focusing on high-tech diagnostic precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNne_SvLcYQLOhaVZ04zNXJN_LUn7eAqPN7D4f4simItHBdi33fvbWo9uVgQFN8UAhqtkthxN66_JESAfgtOAf1zS2ufEqxTI85C0lBU1IJA4vCd1tzsMefPm6g6eD33rxrofT2TDJ75yDuf9r2s4FRHc7fotkZSphhsHZtuaicktgayrsryg0hjbeUyBn1zdg5HumRltomHmHr8snII0gUQz1cT6upHs-MAJwDO2wb-QOqJKaRalVusDDy1k8YBzY_ADx3rhmYls"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="glass-card p-8 rounded-[2rem] flex flex-col justify-between h-80 group">
+<div class="flex justify-between items-start">
+<div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary-fixed-dim">bloodtype</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant border border-white/10 px-3 py-1 rounded-full">ARCHIVE</span>
+</div>
+<div>
+<h4 class="font-display-lg text-[24px] text-on-surface mb-2">Hematology Panel</h4>
+<p class="text-on-surface-variant text-[14px]">Aug 15, 2024 • City Diagnostics</p>
+</div>
+<div class="flex justify-between items-center pt-6 border-t border-white/5">
+<span class="font-label-caps text-[11px] text-outline">NEURAL ENCRYPTION: ON</span>
+<span class="material-symbols-outlined text-primary-fixed-dim opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full relative bg-surface-container-lowest border-t border-white/5 px-6 lg:px-margin-desktop py-20 mt-40">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+<div class="space-y-6">
+<span class="font-display-2xl text-[48px] font-black text-on-surface tracking-tighter uppercase">Vytalix</span>
+<p class="font-body-md text-on-surface-variant max-w-sm">
+                        Redefining clinical precision through avant-garde digital ecosystems and AI synergy.
+                    </p>
+<p class="text-outline text-[14px]">© 2024 Vytalix Health Ecosystem. All Rights Reserved.</p>
+</div>
+<div class="grid grid-cols-2 gap-x-16 gap-y-4">
+<a class="text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Research Papers</a>
+<a class="text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+<script>
+        // Magnetic Mouse Effect for primary buttons
+        document.querySelectorAll('button, .glass-card').forEach(item => {
+            item.addEventListener('mousemove', e => {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                item.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.02)`;
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = `translate(0, 0) scale(1)`;
+            });
+        });
+
+        // Smooth reveal on scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(40px)';
+            card.style.transition = 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+            observer.observe(card);
+        });
+
+        // Subtle parallax on the liquid mesh based on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.liquid-mesh').forEach((mesh, index) => {
+                const speed = (index + 1) * 0.1;
+                mesh.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+    </script>
+</body></html>
