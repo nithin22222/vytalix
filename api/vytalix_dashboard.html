@@ -2506,7 +2506,30 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
         };
     }
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const links = document.querySelectorAll('nav a');
+        links.forEach(link => {
+            const text = link.innerText.trim();
+            if (text.includes('Health Analysis')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('dashboard'); };
+            } else if (text.includes('Vitals')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('ecg'); };
+            } else if (text.includes('Reports')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('history'); };
+            } else if (text.includes('Dashboard')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='none'; window.scrollTo({top:0, behavior:'smooth'}); };
+            } else if (text.includes('Profile')) {
+                link.onclick = (e) => { e.preventDefault(); alert('Profile settings for ' + localStorage.getItem('loggedInUser') + ' will be available soon.'); };
+            } else if (text.includes('Settings')) {
+                link.onclick = (e) => { e.preventDefault(); alert('System settings are locked for non-admin nodes.'); };
+            }
+        });
+    });
+</script>
 </body>
+
 
 
 </html>
@@ -2582,5 +2605,28 @@ State: 1) Agreement level (agree/partially agree/disagree), 2) Key differences, 
         };
     }
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const links = document.querySelectorAll('nav a');
+        links.forEach(link => {
+            const text = link.innerText.trim();
+            if (text.includes('Health Analysis')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('dashboard'); };
+            } else if (text.includes('Vitals')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('ecg'); };
+            } else if (text.includes('Reports')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='block'; switchTab('history'); };
+            } else if (text.includes('Dashboard')) {
+                link.onclick = (e) => { e.preventDefault(); document.getElementById('legacy-form-wrapper').style.display='none'; window.scrollTo({top:0, behavior:'smooth'}); };
+            } else if (text.includes('Profile')) {
+                link.onclick = (e) => { e.preventDefault(); alert('Profile settings for ' + localStorage.getItem('loggedInUser') + ' will be available soon.'); };
+            } else if (text.includes('Settings')) {
+                link.onclick = (e) => { e.preventDefault(); alert('System settings are locked for non-admin nodes.'); };
+            }
+        });
+    });
+</script>
 </body>
+
 </html>
