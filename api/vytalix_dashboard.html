@@ -206,22 +206,22 @@
 </div>
 </div>
 <nav class="flex-grow space-y-2">
-<a class="bg-primary-container text-on-primary-container flex items-center p-4 font-label-caps rounded-xl transition-all" href="#">
+<a class="bg-primary-container text-on-primary-container flex items-center p-4 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="document.getElementById(\'legacy-form-wrapper\').style.display=\'none\'; window.scrollTo({top:0, behavior:\'smooth\'}); return false;">
 <span class="material-symbols-outlined mr-4">grid_view</span> Dashboard
             </a>
-<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="document.getElementById(\'legacy-form-wrapper\').style.display=\'block\'; switchTab(\'dashboard\'); return false;">
 <span class="material-symbols-outlined mr-4" >psychology</span> Health Analysis
             </a>
-<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="document.getElementById(\'legacy-form-wrapper\').style.display=\'block\'; switchTab(\'ecg\'); return false;">
 <span class="material-symbols-outlined mr-4" >monitor_heart</span> Vitals
             </a>
-<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="document.getElementById(\'legacy-form-wrapper\').style.display=\'block\'; switchTab(\'history\'); return false;">
 <span class="material-symbols-outlined mr-4" >description</span> Reports
             </a>
-<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="alert(\'Profile settings for \' + localStorage.getItem(\'loggedInUser\') + \' will be available soon.\'); return false;">
 <span class="material-symbols-outlined mr-4" onclick="alert('Profile settings for ' + localStorage.getItem('loggedInUser') + ' will be available soon.'); return false;">person</span> Profile
             </a>
-<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="#">
+<a class="text-on-surface-variant flex items-center p-4 hover:bg-surface-variant/30 font-label-caps rounded-xl transition-all" href="javascript:void(0)" onclick="alert(\'System settings are locked for non-admin nodes.\'); return false;">
 <span class="material-symbols-outlined mr-4" onclick="alert('System settings are locked for non-admin nodes.'); return false;">settings</span> Settings
             </a>
 </nav>
